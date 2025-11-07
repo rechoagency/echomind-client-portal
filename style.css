@@ -1,0 +1,168 @@
+/* EchoMind Custom Styles */
+
+:root {
+    --primary-blue: #2563eb;
+    --primary-purple: #9333ea;
+    --gradient-start: #3b82f6;
+    --gradient-end: #a855f7;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+}
+
+/* Navigation Active State */
+.nav-btn.active {
+    background: linear-gradient(to right, var(--primary-blue), var(--primary-purple));
+    color: white;
+}
+
+/* View Management */
+.view {
+    display: none;
+}
+
+.view.active {
+    display: block;
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Status Indicators */
+.status-connected {
+    color: #10b981;
+}
+
+.status-disconnected {
+    color: #ef4444;
+}
+
+.status-checking {
+    color: #f59e0b;
+}
+
+/* Client Cards */
+.client-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.client-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Inputs Focus */
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Loading Spinner */
+.spinner {
+    border: 3px solid #f3f4f6;
+    border-top: 3px solid var(--primary-blue);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Success/Error Messages */
+.alert {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.alert-success {
+    background-color: #d1fae5;
+    border: 1px solid #10b981;
+    color: #065f46;
+}
+
+.alert-error {
+    background-color: #fee2e2;
+    border: 1px solid #ef4444;
+    color: #991b1b;
+}
+
+.alert-info {
+    background-color: #dbeafe;
+    border: 1px solid #3b82f6;
+    color: #1e40af;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .nav-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Code Blocks */
+code {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.875rem;
+}
+
+/* Gradient Text */
+.gradient-text {
+    background: linear-gradient(to right, var(--primary-blue), var(--primary-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Button Hover Effects */
+button {
+    transition: all 0.2s ease;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, var(--primary-blue), var(--primary-purple));
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to bottom, #1d4ed8, #7e22ce);
+}
