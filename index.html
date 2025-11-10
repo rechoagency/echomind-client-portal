@@ -6,6 +6,28 @@
     <title>EchoMind - Client Onboarding Dashboard</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .range-value {
+            font-weight: bold;
+            color: #2563eb;
+        }
+        .file-upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .file-upload-area:hover {
+            border-color: #2563eb;
+            background-color: #eff6ff;
+        }
+        .file-upload-area.dragover {
+            border-color: #2563eb;
+            background-color: #dbeafe;
+        }
+    </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen">
     <!-- Navigation -->
@@ -84,92 +106,207 @@
             </div>
         </div>
 
-        <!-- Add Client View -->
+        <!-- Add Client View (COMPLETE VERSION) -->
         <div id="add-client-view" class="view">
             <div class="mb-8">
-                <h2 class="text-3xl font-bold text-gray-900 mb-2">Onboard New Client</h2>
-                <p class="text-gray-600">Complete all sections to set up intelligent Reddit marketing for your client</p>
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Complete Client Onboarding</h2>
+                <p class="text-gray-600">Fill out all sections for intelligent Reddit marketing automation</p>
             </div>
 
-            <form id="client-form" class="bg-white rounded-lg shadow p-6 space-y-6">
-                <!-- Section 1: Basic Info -->
+            <form id="client-form" class="bg-white rounded-lg shadow p-6 space-y-8">
+                
+                <!-- SECTION 1: Basic Information -->
                 <div class="border-b border-gray-200 pb-6">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-4">1. Basic Information</h3>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">1️⃣ Basic Information</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Client Name *</label>
-                            <input type="text" name="client_name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Acme Corp">
+                            <input type="text" name="client_name" required 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                                placeholder="The Waite">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Industry *</label>
-                            <input type="text" name="industry" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="SaaS, E-commerce, etc.">
+                            <input type="text" name="industry" required 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                                placeholder="Baby & Maternity Products">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Website URL</label>
+                            <input type="url" name="website_url" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                                placeholder="https://thewaite.com">
+                            <p class="text-xs text-gray-500 mt-1">🌐 System will auto-scrape products from website</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Contact Email *</label>
+                            <input type="email" name="contact_email" required 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                                placeholder="contact@thewaite.com">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Contact Name</label>
+                            <input type="text" name="contact_name" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                                placeholder="Jonny Waite">
                         </div>
                     </div>
                 </div>
 
-                <!-- Section 2: Product Info -->
+                <!-- SECTION 2: Existing Reddit Presence -->
                 <div class="border-b border-gray-200 pb-6">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-4">2. Product Information</h3>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">2️⃣ Existing Reddit Presence (Optional)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Existing Reddit Username</label>
+                            <input type="text" name="existing_reddit_username" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                                placeholder="u/thewaite or thewaite">
+                            <p class="text-xs text-gray-500 mt-1">If client already has Reddit account</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Existing Subreddit</label>
+                            <input type="text" name="existing_subreddit" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                                placeholder="r/thewaite or thewaite">
+                            <p class="text-xs text-gray-500 mt-1">If client has their own subreddit community</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: Target Configuration -->
+                <div class="border-b border-gray-200 pb-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">3️⃣ Target Subreddits & Keywords</h3>
+                    
+                    <!-- Auto-Identify Toggles -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                        <div class="flex items-center space-x-6">
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" name="auto_identify_subreddits" id="auto-subreddits" class="w-5 h-5 text-blue-600">
+                                <span class="text-sm font-medium text-gray-900">🔍 Auto-Identify Best Subreddits</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" name="auto_identify_keywords" id="auto-keywords" class="w-5 h-5 text-blue-600">
+                                <span class="text-sm font-medium text-gray-900">🎯 Auto-Extract Keywords</span>
+                            </label>
+                        </div>
+                        <p class="text-xs text-gray-600 mt-2">System will analyze industry and website to suggest optimal targets</p>
+                    </div>
+
                     <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Product Name *</label>
-                            <input type="text" name="product_name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="ProjectPro">
+                        <div id="manual-subreddits-section">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Target Subreddits (comma-separated)</label>
+                            <input type="text" name="target_subreddits" id="target_subreddits" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                                placeholder="r/BabyBumps, r/Mommit, r/pregnant">
+                            <p class="text-sm text-gray-500 mt-2">Enter 5-15 subreddits or enable auto-identify</p>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Product Description *</label>
-                            <textarea name="product_description" required rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Describe what the product does, key features, and unique value proposition..."></textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Section 3: Target Subreddits -->
-                <div class="border-b border-gray-200 pb-6">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-4">3. Target Subreddits</h3>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Subreddits (comma-separated) *</label>
-                        <input type="text" name="target_subreddits" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="r/SaaS, r/startups, r/entrepreneur">
-                        <p class="text-sm text-gray-500 mt-2">Enter 5-15 subreddits where your target audience is active</p>
-                    </div>
-                </div>
-
-                <!-- Section 4: Keywords & Topics -->
-                <div class="border-b border-gray-200 pb-6">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-4">4. Keywords & Topics</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Target Keywords *</label>
-                            <input type="text" name="target_keywords" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="project management, team collaboration, productivity">
+                        <div id="manual-keywords-section">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Target Keywords (comma-separated)</label>
+                            <input type="text" name="target_keywords" id="target_keywords" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                                placeholder="maternity leggings, pregnancy clothes, baby essentials">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Excluded Topics</label>
-                            <input type="text" name="excluded_topics" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="crypto, gaming, politics">
-                            <p class="text-sm text-gray-500 mt-2">Topics to avoid mentioning</p>
+                            <input type="text" name="excluded_topics" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                                placeholder="crypto, politics, controversial topics">
                         </div>
                     </div>
                 </div>
 
-                <!-- Section 5: Contact & Notifications -->
+                <!-- SECTION 4: Campaign Strategy -->
+                <div class="border-b border-gray-200 pb-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">4️⃣ Campaign Strategy</h3>
+                    <div class="space-y-6">
+                        <!-- Post vs Reply Ratio -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Post vs Reply Ratio: 
+                                <span id="reply-percentage" class="range-value">70%</span> Replies / 
+                                <span id="post-percentage" class="range-value">30%</span> Posts
+                            </label>
+                            <input type="range" name="post_reply_ratio" id="post-reply-ratio" 
+                                min="0" max="100" value="30" 
+                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                <span>All Replies (0% Posts)</span>
+                                <span>Balanced</span>
+                                <span>All Posts (100% Posts)</span>
+                            </div>
+                        </div>
+
+                        <!-- Posting Frequency -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Posting Frequency (per week)</label>
+                                <input type="number" name="posting_frequency" min="1" max="50" value="5" 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Content Tone</label>
+                                <select name="content_tone" 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <option value="conversational">Conversational</option>
+                                    <option value="professional">Professional</option>
+                                    <option value="casual">Casual</option>
+                                    <option value="technical">Technical</option>
+                                    <option value="friendly">Friendly</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Special Instructions -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Special Instructions & Focus</label>
+                            <textarea name="special_instructions" rows="4" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                                placeholder="Example:
+- Focus on holiday season (Black Friday, Christmas)
+- Avoid mentioning competitors
+- Emphasize sustainability and eco-friendly features
+- Target first-time moms specifically"></textarea>
+                            <p class="text-sm text-gray-500 mt-2">📝 Provide any specific guidelines, seasonal focuses, or brand voice requirements</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 5: Bulk Data Upload -->
+                <div class="border-b border-gray-200 pb-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">5️⃣ Bulk Data Upload (Optional)</h3>
+                    <p class="text-sm text-gray-600 mb-4">Upload product feeds, internal documents, or brand guidelines for AI training and matchback</p>
+                    
+                    <div id="file-upload-area" class="file-upload-area">
+                        <input type="file" id="bulk-data-file" name="bulk_data_file" accept=".pdf,.doc,.docx,.csv,.json,.txt" class="hidden">
+                        <div class="text-center py-6">
+                            <div class="text-4xl mb-2">📄</div>
+                            <p class="text-gray-700 font-medium mb-1">Click to upload or drag & drop</p>
+                            <p class="text-sm text-gray-500">PDF, DOC, CSV, JSON, TXT (Max 50MB)</p>
+                            <p id="file-name-display" class="text-sm text-blue-600 font-medium mt-2 hidden"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 6: Additional Settings -->
                 <div class="pb-6">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-4">5. Contact & Notifications</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Contact Email *</label>
-                            <input type="email" name="contact_email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="john@acmecorp.com">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Slack Webhook URL</label>
-                            <input type="url" name="slack_webhook" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="https://hooks.slack.com/services/...">
-                        </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">6️⃣ Notifications (Optional)</h3>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Slack Webhook URL</label>
+                        <input type="url" name="slack_webhook" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                            placeholder="https://hooks.slack.com/services/...">
+                        <p class="text-xs text-gray-500 mt-1">Get real-time notifications in Slack</p>
                     </div>
                 </div>
 
-                <!-- Submit Button -->
-                <div class="flex items-center justify-between pt-6">
-                    <button type="button" id="cancel-btn" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+                <!-- Submit Buttons -->
+                <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+                    <button type="button" id="cancel-btn" class="px-6 py-3 border-2 border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition">
                         Cancel
                     </button>
-                    <button type="submit" class="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition">
-                        Onboard Client
+                    <button type="submit" class="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-purple-700 transition shadow-lg">
+                        🚀 Onboard Client
                     </button>
                 </div>
             </form>
@@ -183,53 +320,22 @@
             </div>
 
             <div class="space-y-6">
-                <!-- Backend Connection -->
                 <div class="bg-white rounded-lg shadow p-6">
                     <h3 class="text-xl font-semibold text-gray-900 mb-4">🔌 Backend Connection Issues</h3>
                     <div class="space-y-3">
-                        <p class="text-gray-700"><strong>Problem:</strong> "API connection error" or "Backend not available"</p>
+                        <p class="text-gray-700"><strong>Problem:</strong> "Backend not connected"</p>
                         <p class="text-gray-700"><strong>Solution:</strong></p>
                         <ol class="list-decimal list-inside space-y-2 text-gray-600 ml-4">
-                            <li>Check if backend is deployed and running</li>
-                            <li>Verify API URL in <code class="bg-gray-100 px-2 py-1 rounded">js/app.js</code> line 4</li>
-                            <li>Ensure backend URL ends with <code class="bg-gray-100 px-2 py-1 rounded">/api</code></li>
-                            <li>Test backend health endpoint: <code class="bg-gray-100 px-2 py-1 rounded">GET /api/health</code></li>
+                            <li>Check if backend is running at Railway</li>
+                            <li>Verify API URL in js/app.js</li>
+                            <li>Test health endpoint: /api/health</li>
                         </ol>
                     </div>
                 </div>
 
-                <!-- Client Not Appearing -->
-                <div class="bg-white rounded-lg shadow p-6">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-4">👥 Client Not Appearing After Onboarding</h3>
-                    <div class="space-y-3">
-                        <p class="text-gray-700"><strong>Possible Causes:</strong></p>
-                        <ul class="list-disc list-inside space-y-2 text-gray-600 ml-4">
-                            <li>Backend connection failed during submission</li>
-                            <li>Database connection issue</li>
-                            <li>Required field validation error</li>
-                        </ul>
-                        <p class="text-gray-700"><strong>Solution:</strong> Check browser console (F12) for error messages</p>
-                    </div>
-                </div>
-
-                <!-- Reddit Automation Not Working -->
-                <div class="bg-white rounded-lg shadow p-6">
-                    <h3 class="text-xl font-semibold text-gray-900 mb-4">🤖 Reddit Automation Not Working</h3>
-                    <div class="space-y-3">
-                        <p class="text-gray-700"><strong>Check these items:</strong></p>
-                        <ul class="list-disc list-inside space-y-2 text-gray-600 ml-4">
-                            <li>Reddit API credentials configured in backend</li>
-                            <li>Celery workers are running (background tasks)</li>
-                            <li>Redis is connected (task queue)</li>
-                            <li>Target subreddits are valid and accessible</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Contact Support -->
                 <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                    <h3 class="text-xl font-semibold text-blue-900 mb-2">💬 Still Need Help?</h3>
-                    <p class="text-blue-800">Contact your EchoMind administrator for additional support.</p>
+                    <h3 class="text-xl font-semibold text-blue-900 mb-2">💬 Need Help?</h3>
+                    <p class="text-blue-800">Contact your EchoMind administrator for support.</p>
                 </div>
             </div>
         </div>
