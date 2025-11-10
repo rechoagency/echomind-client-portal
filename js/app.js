@@ -1,7 +1,7 @@
 // EchoMind Client Dashboard - Application Logic
 
 // API Configuration
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = 'https://echomind-backend-production.up.railway.app/api';
 
 // State Management
 let currentView = 'dashboard';
