@@ -1,443 +1,696 @@
-// EchoMind Client Dashboard - Complete Application Logic
+// EchoMind Client Onboarding - Wave 1 JavaScript
+// Complete functionality for all 6 Wave 1 features
 
-// API Configuration
-const API_BASE_URL = 'https://echomind-backend-production.up.railway.app/api';
+// Configuration
+const API_URL = 'https://echomind-backend-production.up.railway.app';
 
-// State Management
-let currentView = 'dashboard';
-let clients = [];
-let backendConnected = false;
-let uploadedFile = null;
+// Global state
+let currentSection = 1;
+const totalSections = 6;
+let subreddits = [];
+let keywords = [];
+let excludedKeywords = [];
+let profiles = [];
+let uploadedFiles = [];
 
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', () => {
-    initializeApp();
+document.addEventListener('DOMContentLoaded', function() {
+    initializeTagInputs();
+    initializeFileUpload();
+    initializePostingFrequency();
+    addProfile(); // Add first profile by default
 });
 
-function initializeApp() {
-    setupNavigation();
-    checkBackendConnection();
-    setupClientForm();
-    setupFileUpload();
-    setupPostReplyRatioSlider();
-    setupAutoIdentifyToggles();
-    loadClients();
-}
+// ==================== SECTION NAVIGATION ====================
 
-// Navigation
-function setupNavigation() {
-    const navButtons = {
-        'nav-dashboard': 'dashboard',
-        'nav-add-client': 'add-client',
-        'nav-troubleshoot': 'troubleshoot'
-    };
-
-    Object.entries(navButtons).forEach(([btnId, viewName]) => {
-        document.getElementById(btnId).addEventListener('click', () => {
-            switchView(viewName);
-        });
-    });
-
-    document.getElementById('cancel-btn').addEventListener('click', () => {
-        switchView('dashboard');
-        document.getElementById('client-form').reset();
-        uploadedFile = null;
-        updateFileDisplay(null);
-    });
-}
-
-function switchView(viewName) {
-    document.querySelectorAll('.view').forEach(view => {
-        view.classList.remove('active');
-    });
-
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-
-    document.getElementById(`${viewName}-view`).classList.add('active');
-    document.getElementById(`nav-${viewName}`).classList.add('active');
-
-    currentView = viewName;
-
-    if (viewName === 'dashboard') {
-        loadClients();
+function nextSection() {
+    if (validateSection(currentSection)) {
+        currentSection++;
+        if (currentSection > totalSections) {
+            currentSection = totalSections;
+        }
+        updateUI();
     }
 }
 
-// Backend Connection Check
-async function checkBackendConnection() {
-    const statusEl = document.getElementById('backend-status');
-    const iconEl = document.getElementById('status-icon');
-
-    statusEl.textContent = 'Checking...';
-    statusEl.className = 'text-2xl font-bold text-gray-900 status-checking';
-    iconEl.textContent = '⚙️';
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/health`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
-        });
-
-        if (response.ok) {
-            backendConnected = true;
-            statusEl.textContent = 'Connected';
-            statusEl.className = 'text-2xl font-bold status-connected';
-            iconEl.textContent = '✅';
-        } else {
-            throw new Error('Backend responded with error');
-        }
-    } catch (error) {
-        backendConnected = false;
-        statusEl.textContent = 'Disconnected';
-        statusEl.className = 'text-2xl font-bold status-disconnected';
-        iconEl.textContent = '❌';
-        console.error('Backend connection failed:', error);
-        
-        showAlert('⚠️ Backend not connected. Check troubleshooting tab for help.', 'warning');
+function prevSection() {
+    currentSection--;
+    if (currentSection < 1) {
+        currentSection = 1;
     }
+    updateUI();
 }
 
-// Post/Reply Ratio Slider
-function setupPostReplyRatioSlider() {
-    const slider = document.getElementById('post-reply-ratio');
-    const postPercentage = document.getElementById('post-percentage');
-    const replyPercentage = document.getElementById('reply-percentage');
-
-    slider.addEventListener('input', (e) => {
-        const postValue = e.target.value;
-        const replyValue = 100 - postValue;
-        postPercentage.textContent = `${postValue}%`;
-        replyPercentage.textContent = `${replyValue}%`;
+function updateUI() {
+    // Update sections
+    document.querySelectorAll('.section').forEach(section => {
+        section.classList.remove('active');
     });
-}
+    document.querySelector(`[data-section="${currentSection}"]`).classList.add('active');
 
-// Auto-Identify Toggles
-function setupAutoIdentifyToggles() {
-    const autoSubreddits = document.getElementById('auto-subreddits');
-    const autoKeywords = document.getElementById('auto-keywords');
-    const subredditsInput = document.getElementById('target_subreddits');
-    const keywordsInput = document.getElementById('target_keywords');
-
-    autoSubreddits.addEventListener('change', (e) => {
-        if (e.target.checked) {
-            subredditsInput.disabled = true;
-            subredditsInput.placeholder = '🤖 System will auto-identify best subreddits...';
-            subredditsInput.value = '';
-        } else {
-            subredditsInput.disabled = false;
-            subredditsInput.placeholder = 'r/BabyBumps, r/Mommit, r/pregnant';
-        }
-    });
-
-    autoKeywords.addEventListener('change', (e) => {
-        if (e.target.checked) {
-            keywordsInput.disabled = true;
-            keywordsInput.placeholder = '🤖 System will auto-extract keywords...';
-            keywordsInput.value = '';
-        } else {
-            keywordsInput.disabled = false;
-            keywordsInput.placeholder = 'maternity leggings, pregnancy clothes, baby essentials';
-        }
-    });
-}
-
-// File Upload Handler
-function setupFileUpload() {
-    const fileInput = document.getElementById('bulk-data-file');
-    const uploadArea = document.getElementById('file-upload-area');
-
-    // Click to upload
-    uploadArea.addEventListener('click', () => {
-        fileInput.click();
-    });
-
-    // File selected
-    fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            uploadedFile = file;
-            updateFileDisplay(file);
-        }
-    });
-
-    // Drag and drop
-    uploadArea.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadArea.classList.add('dragover');
-    });
-
-    uploadArea.addEventListener('dragleave', () => {
-        uploadArea.classList.remove('dragover');
-    });
-
-    uploadArea.addEventListener('drop', (e) => {
-        e.preventDefault();
-        uploadArea.classList.remove('dragover');
+    // Update progress bar
+    document.querySelectorAll('.progress-step').forEach(step => {
+        const stepNum = parseInt(step.dataset.step);
+        step.classList.remove('active', 'completed');
         
-        const file = e.dataTransfer.files[0];
-        if (file) {
-            uploadedFile = file;
-            fileInput.files = e.dataTransfer.files;
-            updateFileDisplay(file);
+        if (stepNum === currentSection) {
+            step.classList.add('active');
+        } else if (stepNum < currentSection) {
+            step.classList.add('completed');
         }
     });
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function updateFileDisplay(file) {
-    const display = document.getElementById('file-name-display');
-    if (file) {
-        const sizeKB = (file.size / 1024).toFixed(2);
-        display.textContent = `✅ ${file.name} (${sizeKB} KB)`;
-        display.classList.remove('hidden');
-    } else {
-        display.textContent = '';
-        display.classList.add('hidden');
-    }
-}
+function validateSection(section) {
+    const errorDiv = document.getElementById('errorMessage');
+    errorDiv.classList.remove('active');
 
-// Client Form Handling
-function setupClientForm() {
-    const form = document.getElementById('client-form');
-    
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        if (!backendConnected) {
-            showAlert('❌ Backend not connected. Cannot onboard client.', 'error');
-            return;
-        }
+    switch(section) {
+        case 1:
+            // Company Info validation
+            const companyName = document.getElementById('companyName').value.trim();
+            const industry = document.getElementById('industry').value.trim();
+            const websiteUrl = document.getElementById('websiteUrl').value.trim();
+            const products = getProducts();
 
-        const formData = new FormData(form);
-        
-        // Parse form data into client object
-        const clientData = {
-            client_name: formData.get('client_name'),
-            industry: formData.get('industry'),
-            website_url: formData.get('website_url') || null,
-            existing_reddit_username: formData.get('existing_reddit_username') || null,
-            existing_subreddit: formData.get('existing_subreddit') || null,
-            product_name: null,  // Will be auto-scraped from website
-            product_description: null,
-            auto_identify_subreddits: formData.get('auto_identify_subreddits') === 'on',
-            auto_identify_keywords: formData.get('auto_identify_keywords') === 'on',
-            post_reply_ratio: parseInt(formData.get('post_reply_ratio')),
-            posting_frequency: parseInt(formData.get('posting_frequency')),
-            content_tone: formData.get('content_tone'),
-            special_instructions: formData.get('special_instructions') || null,
-            contact_email: formData.get('contact_email'),
-            contact_name: formData.get('contact_name') || null,
-            slack_webhook: formData.get('slack_webhook') || null,
-            bulk_data_uploaded: uploadedFile !== null
-        };
-
-        // Handle target subreddits
-        const subredditsInput = formData.get('target_subreddits');
-        if (subredditsInput && subredditsInput.trim()) {
-            clientData.target_subreddits = subredditsInput.split(',').map(s => s.trim()).filter(s => s);
-        } else {
-            clientData.target_subreddits = [];
-        }
-
-        // Handle target keywords
-        const keywordsInput = formData.get('target_keywords');
-        if (keywordsInput && keywordsInput.trim()) {
-            clientData.target_keywords = keywordsInput.split(',').map(k => k.trim()).filter(k => k);
-        } else {
-            clientData.target_keywords = [];
-        }
-
-        // Handle excluded topics
-        const excludedInput = formData.get('excluded_topics');
-        if (excludedInput && excludedInput.trim()) {
-            clientData.excluded_topics = excludedInput.split(',').map(t => t.trim()).filter(t => t);
-        } else {
-            clientData.excluded_topics = [];
-        }
-
-        console.log('📤 Sending client data:', clientData);
-
-        try {
-            // Create client
-            const response = await fetch(`${API_BASE_URL}/client-onboarding/clients`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(clientData)
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                console.log('✅ Client created:', result);
-                
-                // Upload bulk data if file was selected
-                if (uploadedFile && result.client_id) {
-                    await uploadBulkData(result.client_id, uploadedFile);
-                }
-
-                // Show success message with next steps
-                let successMessage = `🎉 ${result.message}\n\n`;
-                if (result.next_steps && result.next_steps.length > 0) {
-                    successMessage += 'Next steps:\n' + result.next_steps.join('\n');
-                }
-
-                showAlert(successMessage, 'success');
-                
-                form.reset();
-                uploadedFile = null;
-                updateFileDisplay(null);
-                switchView('dashboard');
-                loadClients();
-            } else {
-                console.error('❌ Server error:', result);
-                const errorMessage = result.detail || result.message || 'Failed to onboard client';
-                showAlert(`❌ Error: ${errorMessage}`, 'error');
+            if (!companyName) {
+                showError('Please enter your company name');
+                return false;
             }
-        } catch (error) {
-            console.error('❌ Network error:', error);
-            showAlert(`❌ Network error: ${error.message}. Check backend connection.`, 'error');
+            if (!industry) {
+                showError('Please enter your industry');
+                return false;
+            }
+            if (!websiteUrl) {
+                showError('Please enter your website URL');
+                return false;
+            }
+            if (products.length === 0 || products[0].trim() === '') {
+                showError('Please add at least one product or service');
+                return false;
+            }
+            break;
+
+        case 2:
+            // Target Audience validation
+            if (subreddits.length === 0) {
+                showError('Please add at least one target subreddit');
+                return false;
+            }
+            if (keywords.length === 0) {
+                showError('Please add at least one target keyword');
+                return false;
+            }
+            break;
+
+        case 3:
+            // Reddit Profiles validation
+            if (profiles.length === 0) {
+                showError('Please add at least one Reddit profile');
+                return false;
+            }
+            
+            // Validate each profile
+            for (let i = 0; i < profiles.length; i++) {
+                const profile = profiles[i];
+                if (!profile.username || profile.username.trim() === '') {
+                    showError(`Profile ${i + 1}: Please enter a username`);
+                    return false;
+                }
+                if (!profile.profile_type || profile.profile_type === '') {
+                    showError(`Profile ${i + 1}: Please select a profile type`);
+                    return false;
+                }
+                if (profile.target_subreddits.length === 0) {
+                    showError(`Profile ${i + 1}: Please add at least one target subreddit`);
+                    return false;
+                }
+            }
+            break;
+
+        case 4:
+            // Content Strategy validation
+            const frequency = document.getElementById('postingFrequency').value;
+            const budget = document.getElementById('opportunityBudget').value;
+            const tone = document.getElementById('contentTone').value;
+
+            if (!frequency || frequency < 1) {
+                showError('Please enter a valid posting frequency');
+                return false;
+            }
+            if (!budget || budget < 1) {
+                showError('Please enter a valid opportunity budget');
+                return false;
+            }
+            if (!tone) {
+                showError('Please select a content tone');
+                return false;
+            }
+            break;
+
+        case 5:
+            // Brand Materials - optional, so just validate file count if any
+            if (uploadedFiles.length > 0 && uploadedFiles.length < 5) {
+                const proceed = confirm('You have uploaded fewer than 5 files. For best results, we recommend 5-100+ files. Do you want to continue anyway?');
+                if (!proceed) return false;
+            }
+            break;
+
+        case 6:
+            // Notifications validation
+            const notificationEmail = document.getElementById('notificationEmail').value.trim();
+            if (!notificationEmail) {
+                showError('Please enter a notification email address');
+                return false;
+            }
+            if (!isValidEmail(notificationEmail)) {
+                showError('Please enter a valid email address');
+                return false;
+            }
+            break;
+    }
+
+    return true;
+}
+
+function showError(message) {
+    const errorDiv = document.getElementById('errorMessage');
+    errorDiv.textContent = '⚠️ ' + message;
+    errorDiv.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// ==================== TAG INPUT FUNCTIONALITY ====================
+
+function initializeTagInputs() {
+    // Subreddits tag input
+    const subredditInput = document.getElementById('subredditInput');
+    const subredditsContainer = document.getElementById('subredditsContainer');
+    
+    subredditInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addTag(subredditInput, subredditsContainer, subreddits);
         }
+    });
+
+    subredditsContainer.addEventListener('click', () => {
+        subredditInput.focus();
+    });
+
+    // Keywords tag input
+    const keywordInput = document.getElementById('keywordInput');
+    const keywordsContainer = document.getElementById('keywordsContainer');
+    
+    keywordInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addTag(keywordInput, keywordsContainer, keywords);
+        }
+    });
+
+    keywordsContainer.addEventListener('click', () => {
+        keywordInput.focus();
+    });
+
+    // Excluded keywords tag input
+    const excludedInput = document.getElementById('excludedInput');
+    const excludedContainer = document.getElementById('excludedContainer');
+    
+    excludedInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addTag(excludedInput, excludedContainer, excludedKeywords);
+        }
+    });
+
+    excludedContainer.addEventListener('click', () => {
+        excludedInput.focus();
     });
 }
 
-async function uploadBulkData(clientId, file) {
-    try {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('data_type', 'internal_docs');  // Default type
-
-        const response = await fetch(`${API_BASE_URL}/client-onboarding/clients/${clientId}/bulk-data`, {
-            method: 'POST',
-            body: formData
-        });
-
-        if (response.ok) {
-            const result = await response.json();
-            console.log('📄 Bulk data uploaded:', result);
-            showAlert(`📄 File "${file.name}" uploaded successfully. Vectorization in progress.`, 'info');
-        } else {
-            console.error('Failed to upload bulk data');
-        }
-    } catch (error) {
-        console.error('Error uploading bulk data:', error);
+function addTag(input, container, array) {
+    const value = input.value.trim();
+    if (value && !array.includes(value)) {
+        array.push(value);
+        renderTags(container, array, input);
+        input.value = '';
     }
 }
 
-// Load Clients List
-async function loadClients() {
-    const listEl = document.getElementById('clients-list');
-    const activeClientsEl = document.getElementById('active-clients');
-    const activeCampaignsEl = document.getElementById('active-campaigns');
+function removeTag(container, array, value, input) {
+    const index = array.indexOf(value);
+    if (index > -1) {
+        array.splice(index, 1);
+        renderTags(container, array, input);
+    }
+}
 
-    if (!backendConnected) {
-        listEl.innerHTML = '<p class="text-gray-500 text-center py-8">Backend not connected. Cannot load clients.</p>';
+function renderTags(container, array, input) {
+    // Clear existing tags
+    const existingTags = container.querySelectorAll('.tag');
+    existingTags.forEach(tag => tag.remove());
+
+    // Add tags before input
+    array.forEach(value => {
+        const tag = document.createElement('div');
+        tag.className = 'tag';
+        tag.innerHTML = `
+            ${value}
+            <span class="tag-remove" onclick="removeTagByValue('${container.id}', '${value}')">×</span>
+        `;
+        container.insertBefore(tag, input);
+    });
+}
+
+function removeTagByValue(containerId, value) {
+    const container = document.getElementById(containerId);
+    const input = container.querySelector('input');
+    
+    if (containerId === 'subredditsContainer') {
+        removeTag(container, subreddits, value, input);
+    } else if (containerId === 'keywordsContainer') {
+        removeTag(container, keywords, value, input);
+    } else if (containerId === 'excludedContainer') {
+        removeTag(container, excludedKeywords, value, input);
+    }
+}
+
+// ==================== PRODUCTS FUNCTIONALITY ====================
+
+function getProducts() {
+    const inputs = document.querySelectorAll('.product-input');
+    const products = [];
+    inputs.forEach(input => {
+        const value = input.value.trim();
+        if (value) {
+            products.push(value);
+        }
+    });
+    return products;
+}
+
+function addProduct() {
+    const productsList = document.getElementById('productsList');
+    const itemEntry = document.createElement('div');
+    itemEntry.className = 'item-entry';
+    itemEntry.innerHTML = `
+        <input type="text" placeholder="e.g., Another product or service" class="product-input">
+        <button type="button" onclick="this.parentElement.remove()">Remove</button>
+    `;
+    productsList.appendChild(itemEntry);
+}
+
+// ==================== REDDIT PROFILES FUNCTIONALITY ====================
+
+function addProfile() {
+    if (profiles.length >= 10) {
+        showError('Maximum 10 profiles allowed');
         return;
     }
 
-    listEl.innerHTML = '<div class="spinner"></div>';
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/client-onboarding/clients`);
-        
-        if (response.ok) {
-            clients = await response.json();
-            
-            if (clients.length === 0) {
-                listEl.innerHTML = '<p class="text-gray-500 text-center py-8">No clients onboarded yet. Click "Add New Client" to get started!</p>';
-                activeClientsEl.textContent = '0';
-                activeCampaignsEl.textContent = '0';
-            } else {
-                renderClientsList(clients);
-                activeClientsEl.textContent = clients.length;
-                const totalCampaigns = clients.reduce((sum, client) => {
-                    return sum + (client.active_campaigns || 0);
-                }, 0);
-                activeCampaignsEl.textContent = totalCampaigns;
-            }
-        } else {
-            throw new Error('Failed to fetch clients');
-        }
-    } catch (error) {
-        console.error('Error loading clients:', error);
-        listEl.innerHTML = '<p class="text-red-500 text-center py-8">Error loading clients. Check backend connection.</p>';
-    }
-}
-
-function renderClientsList(clientsData) {
-    const listEl = document.getElementById('clients-list');
-    
-    const html = `
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            ${clientsData.map(client => `
-                <div class="client-card bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition">
-                    <div class="flex items-center justify-between mb-4">
-                        <h4 class="text-lg font-semibold text-gray-900">${client.client_name}</h4>
-                        <span class="px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Active</span>
-                    </div>
-                    <p class="text-sm text-gray-600 mb-2"><strong>Industry:</strong> ${client.industry}</p>
-                    ${client.website_url ? `<p class="text-sm text-gray-600 mb-2"><strong>Website:</strong> <a href="${client.website_url}" target="_blank" class="text-blue-600 hover:underline">${client.website_url}</a></p>` : ''}
-                    <p class="text-sm text-gray-600 mb-2"><strong>Subreddits:</strong> ${client.target_subreddits ? client.target_subreddits.length : 0}</p>
-                    <p class="text-sm text-gray-600 mb-4"><strong>Keywords:</strong> ${client.target_keywords ? client.target_keywords.length : 0}</p>
-                    <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-                        <span class="text-xs text-gray-500">Created: ${new Date(client.created_at).toLocaleDateString()}</span>
-                        <button onclick="viewClientDetail('${client.id}')" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                            View Details →
-                        </button>
-                    </div>
-                </div>
-            `).join('')}
-        </div>
-    `;
-    
-    listEl.innerHTML = html;
-}
-
-// View Client Detail
-function viewClientDetail(clientId) {
-    const client = clients.find(c => c.id === clientId);
-    if (client) {
-        let details = `Client: ${client.client_name}\n`;
-        details += `Industry: ${client.industry}\n`;
-        details += `Contact: ${client.contact_email}\n`;
-        if (client.website_url) details += `Website: ${client.website_url}\n`;
-        if (client.target_subreddits && client.target_subreddits.length > 0) {
-            details += `\nTarget Subreddits:\n${client.target_subreddits.join(', ')}\n`;
-        }
-        if (client.target_keywords && client.target_keywords.length > 0) {
-            details += `\nTarget Keywords:\n${client.target_keywords.join(', ')}\n`;
-        }
-        if (client.special_instructions) {
-            details += `\nSpecial Instructions:\n${client.special_instructions}\n`;
-        }
-        details += `\n(Full detail view coming soon)`;
-        alert(details);
-    }
-}
-
-// Alert System
-function showAlert(message, type = 'info') {
-    const alertEl = document.createElement('div');
-    
-    const typeClasses = {
-        'success': 'bg-green-50 border-green-200 text-green-800',
-        'error': 'bg-red-50 border-red-200 text-red-800',
-        'warning': 'bg-yellow-50 border-yellow-200 text-yellow-800',
-        'info': 'bg-blue-50 border-blue-200 text-blue-800'
+    const profileId = Date.now();
+    const profile = {
+        id: profileId,
+        username: '',
+        profile_type: '',
+        target_subreddits: []
     };
     
-    alertEl.className = `alert border-2 rounded-lg p-4 mb-4 ${typeClasses[type] || typeClasses.info}`;
-    alertEl.style.whiteSpace = 'pre-line';  // Preserve line breaks
-    alertEl.textContent = message;
-    
-    const mainEl = document.querySelector('main');
-    mainEl.insertBefore(alertEl, mainEl.firstChild);
-    
-    // Auto-dismiss after 8 seconds
-    setTimeout(() => {
-        alertEl.remove();
-    }, 8000);
+    profiles.push(profile);
+    renderProfiles();
 }
 
-// Export for HTML onclick handlers
-window.viewClientDetail = viewClientDetail;
+function removeProfile(profileId) {
+    profiles = profiles.filter(p => p.id !== profileId);
+    renderProfiles();
+}
+
+function renderProfiles() {
+    const container = document.getElementById('profilesContainer');
+    const addBtn = document.getElementById('addProfileBtn');
+    
+    container.innerHTML = '';
+    
+    profiles.forEach((profile, index) => {
+        const profileCard = document.createElement('div');
+        profileCard.className = 'profile-card';
+        profileCard.innerHTML = `
+            <div class="profile-header">
+                <div class="profile-number">Profile ${index + 1}</div>
+                ${profiles.length > 1 ? `<button type="button" class="remove-profile-btn" onclick="removeProfile(${profile.id})">Remove</button>` : ''}
+            </div>
+            
+            <div class="form-group">
+                <label>Reddit Username *</label>
+                <input type="text" 
+                       placeholder="e.g., u/TheWaite" 
+                       value="${profile.username}"
+                       onchange="updateProfile(${profile.id}, 'username', this.value)">
+            </div>
+            
+            <div class="form-group">
+                <label>Profile Type *</label>
+                <select onchange="updateProfile(${profile.id}, 'profile_type', this.value)">
+                    <option value="">Select profile type...</option>
+                    <option value="official_brand" ${profile.profile_type === 'official_brand' ? 'selected' : ''}>Official Brand Account</option>
+                    <option value="personal_brand" ${profile.profile_type === 'personal_brand' ? 'selected' : ''}>Personal Brand Account</option>
+                    <option value="community_specific" ${profile.profile_type === 'community_specific' ? 'selected' : ''}>Community-Specific Account</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Target Subreddits for This Profile * <span class="label-hint">(Press Enter after each)</span></label>
+                <div class="tag-input-container" id="profile-subreddits-${profile.id}">
+                    <input type="text" 
+                           placeholder="e.g., r/Mommit"
+                           onkeydown="handleProfileSubreddit(event, ${profile.id})">
+                </div>
+            </div>
+        `;
+        
+        container.appendChild(profileCard);
+        
+        // Render existing subreddits for this profile
+        renderProfileSubreddits(profile.id);
+    });
+    
+    // Update add button state
+    if (profiles.length >= 10) {
+        addBtn.disabled = true;
+        addBtn.textContent = '✓ Maximum 10 Profiles Reached';
+    } else {
+        addBtn.disabled = false;
+        addBtn.textContent = '+ Add Reddit Profile';
+    }
+}
+
+function updateProfile(profileId, field, value) {
+    const profile = profiles.find(p => p.id === profileId);
+    if (profile) {
+        profile[field] = value;
+    }
+}
+
+function handleProfileSubreddit(event, profileId) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        const input = event.target;
+        const value = input.value.trim();
+        
+        if (value) {
+            const profile = profiles.find(p => p.id === profileId);
+            if (profile && !profile.target_subreddits.includes(value)) {
+                profile.target_subreddits.push(value);
+                renderProfileSubreddits(profileId);
+                input.value = '';
+            }
+        }
+    }
+}
+
+function removeProfileSubreddit(profileId, subreddit) {
+    const profile = profiles.find(p => p.id === profileId);
+    if (profile) {
+        profile.target_subreddits = profile.target_subreddits.filter(s => s !== subreddit);
+        renderProfileSubreddits(profileId);
+    }
+}
+
+function renderProfileSubreddits(profileId) {
+    const profile = profiles.find(p => p.id === profileId);
+    if (!profile) return;
+    
+    const container = document.getElementById(`profile-subreddits-${profileId}`);
+    const input = container.querySelector('input');
+    
+    // Remove existing tags
+    const existingTags = container.querySelectorAll('.tag');
+    existingTags.forEach(tag => tag.remove());
+    
+    // Add new tags
+    profile.target_subreddits.forEach(subreddit => {
+        const tag = document.createElement('div');
+        tag.className = 'tag';
+        tag.innerHTML = `
+            ${subreddit}
+            <span class="tag-remove" onclick="removeProfileSubreddit(${profileId}, '${subreddit}')">×</span>
+        `;
+        container.insertBefore(tag, input);
+    });
+}
+
+// ==================== POSTING FREQUENCY FUNCTIONALITY ====================
+
+function initializePostingFrequency() {
+    const frequencyInput = document.getElementById('postingFrequency');
+    frequencyInput.addEventListener('input', updatePostingSchedule);
+}
+
+function updatePostingSchedule() {
+    const frequency = parseInt(document.getElementById('postingFrequency').value);
+    const scheduleDisplay = document.getElementById('scheduleDisplay');
+    
+    if (frequency && frequency > 0) {
+        const mondayPosts = Math.ceil(frequency / 2);
+        const thursdayPosts = Math.floor(frequency / 2);
+        
+        document.getElementById('mondayPosts').textContent = mondayPosts;
+        document.getElementById('thursdayPosts').textContent = thursdayPosts;
+        
+        scheduleDisplay.style.display = 'block';
+    } else {
+        scheduleDisplay.style.display = 'none';
+    }
+}
+
+// ==================== FILE UPLOAD FUNCTIONALITY ====================
+
+function initializeFileUpload() {
+    const container = document.getElementById('fileUploadContainer');
+    const input = document.getElementById('fileInput');
+    
+    // Click to upload
+    container.addEventListener('click', () => {
+        input.click();
+    });
+    
+    // File selection
+    input.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+    });
+    
+    // Drag and drop
+    container.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        container.classList.add('dragover');
+    });
+    
+    container.addEventListener('dragleave', () => {
+        container.classList.remove('dragover');
+    });
+    
+    container.addEventListener('drop', (e) => {
+        e.preventDefault();
+        container.classList.remove('dragover');
+        handleFiles(e.dataTransfer.files);
+    });
+}
+
+function handleFiles(files) {
+    Array.from(files).forEach(file => {
+        // Check if file already exists
+        if (!uploadedFiles.find(f => f.name === file.name && f.size === file.size)) {
+            uploadedFiles.push(file);
+        }
+    });
+    
+    renderFileList();
+}
+
+function removeFile(index) {
+    uploadedFiles.splice(index, 1);
+    renderFileList();
+}
+
+function renderFileList() {
+    const fileList = document.getElementById('fileList');
+    
+    if (uploadedFiles.length === 0) {
+        fileList.innerHTML = '';
+        return;
+    }
+    
+    const totalSize = uploadedFiles.reduce((sum, file) => sum + file.size, 0);
+    const totalSizeGB = (totalSize / (1024 * 1024 * 1024)).toFixed(2);
+    
+    fileList.innerHTML = `
+        <div style="margin-bottom: 15px; padding: 12px; background: #eff6ff; border-radius: 8px; border: 1px solid #bae6fd;">
+            <strong style="color: #0369a1;">📊 ${uploadedFiles.length} files selected</strong>
+            <span style="color: #0c4a6e; margin-left: 10px;">Total: ${totalSizeGB} GB</span>
+        </div>
+        ${uploadedFiles.map((file, index) => `
+            <div class="file-item">
+                <div class="file-info">
+                    <div class="file-name">${file.name}</div>
+                    <div class="file-size">${formatFileSize(file.size)}</div>
+                </div>
+                <button type="button" class="file-remove" onclick="removeFile(${index})">Remove</button>
+            </div>
+        `).join('')}
+    `;
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// ==================== FORM SUBMISSION ====================
+
+async function submitForm() {
+    if (!validateSection(6)) {
+        return;
+    }
+    
+    const submitBtn = document.querySelector('.btn-submit');
+    submitBtn.disabled = true;
+    submitBtn.textContent = '⏳ Processing...';
+    
+    try {
+        // Prepare form data
+        const formData = {
+            // Section 1: Company Info
+            company_name: document.getElementById('companyName').value.trim(),
+            industry: document.getElementById('industry').value.trim(),
+            website_url: document.getElementById('websiteUrl').value.trim(),
+            products: getProducts(),
+            
+            // Section 2: Target Audience
+            target_subreddits: subreddits,
+            brand_owns_subreddit: document.getElementById('brandOwnsSubreddit').checked,
+            target_keywords: keywords,
+            excluded_keywords: excludedKeywords,
+            
+            // Section 3: Reddit Profiles
+            reddit_user_profiles: profiles.map(p => ({
+                username: p.username,
+                profile_type: p.profile_type,
+                target_subreddits: p.target_subreddits
+            })),
+            
+            // Section 4: Content Strategy
+            posting_frequency: parseInt(document.getElementById('postingFrequency').value),
+            monthly_opportunity_budget: parseInt(document.getElementById('opportunityBudget').value),
+            content_tone: document.getElementById('contentTone').value,
+            brand_voice_guidelines: document.getElementById('brandVoice').value.trim() || null,
+            
+            // Section 6: Notifications
+            notification_email: document.getElementById('notificationEmail').value.trim(),
+            slack_webhook_url: document.getElementById('slackWebhook').value.trim() || null,
+            primary_contact_name: document.getElementById('contactName').value.trim() || null,
+            primary_contact_email: document.getElementById('contactEmail').value.trim() || null,
+            
+            // Subscription info (defaults)
+            subscription_tier: 'professional',
+            subscription_status: 'active',
+            monthly_price_usd: 2000
+        };
+        
+        // Submit main form data
+        const response = await fetch(`${API_URL}/api/client-onboarding/onboard`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || 'Failed to submit onboarding form');
+        }
+        
+        const result = await response.json();
+        console.log('Onboarding successful:', result);
+        
+        // Upload files if any (non-blocking)
+        if (uploadedFiles.length > 0) {
+            uploadFiles(result.client_id).catch(err => {
+                console.error('File upload error (non-critical):', err);
+            });
+        }
+        
+        // Show success message
+        document.querySelectorAll('.section').forEach(section => {
+            section.classList.remove('active');
+        });
+        
+        const successMessage = document.getElementById('successMessage');
+        successMessage.classList.add('active');
+        
+        // Update progress bar to completed
+        document.querySelectorAll('.progress-step').forEach(step => {
+            step.classList.add('completed');
+            step.classList.remove('active');
+        });
+        
+    } catch (error) {
+        console.error('Submission error:', error);
+        showError(error.message || 'Failed to submit form. Please try again.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = '🚀 Complete Onboarding';
+    }
+}
+
+async function uploadFiles(clientId) {
+    try {
+        const formData = new FormData();
+        formData.append('client_id', clientId);
+        
+        uploadedFiles.forEach(file => {
+            formData.append('files', file);
+        });
+        
+        const response = await fetch(`${API_URL}/api/client-onboarding/upload-files`, {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!response.ok) {
+            throw new Error('File upload failed');
+        }
+        
+        const result = await response.json();
+        console.log('Files uploaded successfully:', result);
+        
+    } catch (error) {
+        console.error('File upload error:', error);
+        // Non-critical error, don't show to user
+    }
+}
+
+// ==================== UTILITY FUNCTIONS ====================
+
+// Expose functions to global scope for onclick handlers
+window.nextSection = nextSection;
+window.prevSection = prevSection;
+window.addProduct = addProduct;
+window.removeTagByValue = removeTagByValue;
+window.addProfile = addProfile;
+window.removeProfile = removeProfile;
+window.updateProfile = updateProfile;
+window.handleProfileSubreddit = handleProfileSubreddit;
+window.removeProfileSubreddit = removeProfileSubreddit;
+window.removeFile = removeFile;
+window.submitForm = submitForm;
