@@ -856,17 +856,8 @@ async function submitForm() {
             });
         }
         
-        document.querySelectorAll('.section').forEach(section => {
-            section.classList.remove('active');
-        });
-        
-        const successMessage = document.getElementById('successMessage');
-        successMessage.classList.add('active');
-        
-        document.querySelectorAll('.progress-step').forEach(step => {
-            step.classList.add('completed');
-            step.classList.remove('active');
-        });
+        // Redirect to dashboard after successful onboarding
+        window.location.href = `/dashboard.html?client_id=${result.client_id}`;
         
     } catch (error) {
         console.error('Submission error:', error);
