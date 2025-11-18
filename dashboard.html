@@ -427,6 +427,12 @@
         }
         
         async function viewClient(clientId) {
+            // Navigate to client-specific dashboard
+            window.location.href = `/client-dashboard.html?client_id=${clientId}`;
+        }
+        
+        async function viewClientModal(clientId) {
+            // Keep modal function for future use if needed
             const modal = document.getElementById('clientModal');
             const modalBody = document.getElementById('modalBody');
             
