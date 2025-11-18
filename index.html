@@ -976,6 +976,20 @@
                     </div>
                 </div>
 
+                <!-- SPECIAL INSTRUCTIONS FIELD -->
+                <div class="form-group" style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #e9ecef;">
+                    <label for="specialInstructions">
+                        Special Instructions
+                        <span class="label-hint">(Medical disclaimers, legal guidelines, exclusions, seasonal instructions, etc.)</span>
+                    </label>
+                    <textarea id="specialInstructions" name="explicit_instructions" rows="6" 
+                              placeholder="Example:\n- MEDICAL: Always include 'Consult your doctor before...' for health advice\n- LEGAL: Never claim products 'cure' or 'treat' conditions\n- EXCLUSIONS: Do not mention competitor brands X, Y, Z\n- SEASONAL: Holiday gift guide season Nov 15 - Dec 24\n- TONE: Avoid technical jargon when discussing sensitive topics"
+                              style="font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.6; background: #f8f9fa;"></textarea>
+                    <div class="info-box" style="margin-top: 10px; font-size: 13px;">
+                        <strong>🔒 Compliance & Safety:</strong> These instructions are applied to EVERY piece of content generated. Use this for medical disclaimers, legal requirements, brand exclusions, or any other critical guidelines.
+                    </div>
+                </div>
+
                 <div class="buttons">
                     <button type="button" class="btn-back" onclick="prevSection()">← Back</button>
                     <button type="button" class="btn-next" onclick="nextSection()">Next: Brand Materials →</button>
