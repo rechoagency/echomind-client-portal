@@ -57,14 +57,14 @@ async function loadClientSettings() {
             const settings = await response.json();
             
             // Update sliders
-            document.getElementById('replyPostSlider').value = settings.reply_percentage || 70;
-            document.getElementById('brandMentionSlider').value = settings.brand_mention_percentage || 30;
-            document.getElementById('productMentionSlider').value = settings.product_mention_percentage || 20;
+            document.getElementById('replyPostSlider').value = settings.reply_percentage || 75;
+            document.getElementById('brandMentionSlider').value = settings.brand_mention_percentage || 0;
+            document.getElementById('productMentionSlider').value = settings.product_mention_percentage || 0;
             
             // Update displays
-            updateSliderValue('replyPostValue', settings.reply_percentage || 70, 'replyPost');
-            updateSliderValue('brandMentionValue', settings.brand_mention_percentage || 30);
-            updateSliderValue('productMentionValue', settings.product_mention_percentage || 20);
+            updateSliderValue('replyPostValue', settings.reply_percentage || 75, 'replyPost');
+            updateSliderValue('brandMentionValue', settings.brand_mention_percentage || 0);
+            updateSliderValue('productMentionValue', settings.product_mention_percentage || 0);
         }
     } catch (error) {
         console.error('Error loading settings:', error);
@@ -83,22 +83,25 @@ function updateSliderValue(elementId, value, type) {
     }
 }
 
-// Save strategy settings
+// Save strategy settings - FIXED: Use correct endpoint and all required fields
 async function saveStrategy() {
-    const replyPercentage = parseInt(document.getElementById('replyPostSlider').value);
-    const brandPercentage = parseInt(document.getElementById('brandMentionSlider').value);
-    const productPercentage = parseInt(document.getElementById('productMentionSlider').value);
+    const replyPercentage = parseFloat(document.getElementById('replyPostSlider').value);
+    const brandPercentage = parseFloat(document.getElementById('brandMentionSlider').value);
+    const productPercentage = parseFloat(document.getElementById('productMentionSlider').value);
     
     const settings = {
-        client_id: CLIENT_ID,
         reply_percentage: replyPercentage,
         post_percentage: 100 - replyPercentage,
         brand_mention_percentage: brandPercentage,
-        product_mention_percentage: productPercentage
+        product_mention_percentage: productPercentage,
+        product_relevance_threshold: 0.75,
+        current_phase: 1,
+        explicit_instructions: null,
+        auto_phase_progression: false
     };
     
     try {
-        const response = await fetch(`${API_URL}/api/client-settings`, {
+        const response = await fetch(`${API_URL}/api/client-settings/${CLIENT_ID}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -109,18 +112,24 @@ async function saveStrategy() {
         if (response.ok) {
             alert('✅ Strategy settings saved successfully!');
         } else {
-            throw new Error('Failed to save settings');
+            const error = await response.json();
+            throw new Error(error.detail || 'Failed to save settings');
         }
     } catch (error) {
         console.error('Error saving settings:', error);
-        alert('❌ Failed to save settings. Please try again.');
+        alert('❌ Failed to save settings. ' + error.message);
     }
 }
 
-// Load keywords
+// Load keywords with edit capability
 function loadKeywords() {
     if (!clientData || !clientData.target_keywords) {
-        document.getElementById('keywordsList').innerHTML = '<p>No keywords configured</p>';
+        document.getElementById('keywordsList').innerHTML = `
+            <p>No keywords configured</p>
+            <button class="btn btn-sm btn-primary mt-2" onclick="addKeyword()">
+                <i class="fas fa-plus"></i> Add Keyword
+            </button>
+        `;
         return;
     }
     
@@ -128,17 +137,29 @@ function loadKeywords() {
         ? clientData.target_keywords 
         : clientData.target_keywords.split(',');
     
-    const html = keywords.map(keyword => 
-        `<span class="badge-custom badge-primary">${keyword.trim()}</span>`
+    const html = keywords.map((keyword, index) => 
+        `<span class="badge-custom badge-primary">
+            ${keyword.trim()}
+            <button class="btn-remove-badge" onclick="removeKeyword(${index})">&times;</button>
+        </span>`
     ).join('');
     
-    document.getElementById('keywordsList').innerHTML = html || '<p>No keywords configured</p>';
+    document.getElementById('keywordsList').innerHTML = html + `
+        <button class="btn btn-sm btn-primary mt-2" onclick="addKeyword()">
+            <i class="fas fa-plus"></i> Add Keyword
+        </button>
+    `;
 }
 
-// Load subreddits
+// Load subreddits with edit capability
 function loadSubreddits() {
     if (!clientData || !clientData.target_subreddits) {
-        document.getElementById('subredditsList').innerHTML = '<p>No subreddits configured</p>';
+        document.getElementById('subredditsList').innerHTML = `
+            <p>No subreddits configured</p>
+            <button class="btn btn-sm btn-primary mt-2" onclick="addSubreddit()">
+                <i class="fas fa-plus"></i> Add Subreddit
+            </button>
+        `;
         return;
     }
     
@@ -146,9 +167,138 @@ function loadSubreddits() {
         ? clientData.target_subreddits 
         : clientData.target_subreddits.split(',');
     
-    const html = subreddits.map(subreddit => 
-        `<span class="badge-custom badge-primary">r/${subreddit.trim().replace('r/', '')}</span>`
+    const html = subreddits.map((subreddit, index) => 
+        `<span class="badge-custom badge-primary">
+            r/${subreddit.trim().replace('r/', '')}
+            <button class="btn-remove-badge" onclick="removeSubreddit(${index})">&times;</button>
+        </span>`
     ).join('');
     
-    document.getElementById('subredditsList').innerHTML = html || '<p>No subreddits configured</p>';
+    document.getElementById('subredditsList').innerHTML = html + `
+        <button class="btn btn-sm btn-primary mt-2" onclick="addSubreddit()">
+            <i class="fas fa-plus"></i> Add Subreddit
+        </button>
+    `;
+}
+
+// Add keyword
+async function addKeyword() {
+    const keyword = prompt('Enter a new keyword:');
+    if (!keyword || !keyword.trim()) return;
+    
+    try {
+        const keywords = Array.isArray(clientData.target_keywords) 
+            ? clientData.target_keywords 
+            : clientData.target_keywords.split(',');
+        
+        keywords.push(keyword.trim());
+        
+        const response = await fetch(`${API_URL}/api/clients/${CLIENT_ID}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ target_keywords: keywords })
+        });
+        
+        if (response.ok) {
+            clientData.target_keywords = keywords;
+            loadKeywords();
+            alert('✅ Keyword added successfully!');
+        } else {
+            throw new Error('Failed to add keyword');
+        }
+    } catch (error) {
+        console.error('Error adding keyword:', error);
+        alert('❌ Failed to add keyword. Please try again.');
+    }
+}
+
+// Remove keyword
+async function removeKeyword(index) {
+    if (!confirm('Remove this keyword?')) return;
+    
+    try {
+        const keywords = Array.isArray(clientData.target_keywords) 
+            ? clientData.target_keywords 
+            : clientData.target_keywords.split(',');
+        
+        keywords.splice(index, 1);
+        
+        const response = await fetch(`${API_URL}/api/clients/${CLIENT_ID}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ target_keywords: keywords })
+        });
+        
+        if (response.ok) {
+            clientData.target_keywords = keywords;
+            loadKeywords();
+            alert('✅ Keyword removed successfully!');
+        } else {
+            throw new Error('Failed to remove keyword');
+        }
+    } catch (error) {
+        console.error('Error removing keyword:', error);
+        alert('❌ Failed to remove keyword. Please try again.');
+    }
+}
+
+// Add subreddit
+async function addSubreddit() {
+    const subreddit = prompt('Enter a new subreddit (without r/):');
+    if (!subreddit || !subreddit.trim()) return;
+    
+    try {
+        const subreddits = Array.isArray(clientData.target_subreddits) 
+            ? clientData.target_subreddits 
+            : clientData.target_subreddits.split(',');
+        
+        subreddits.push(subreddit.trim().replace('r/', ''));
+        
+        const response = await fetch(`${API_URL}/api/clients/${CLIENT_ID}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ target_subreddits: subreddits })
+        });
+        
+        if (response.ok) {
+            clientData.target_subreddits = subreddits;
+            loadSubreddits();
+            alert('✅ Subreddit added successfully!');
+        } else {
+            throw new Error('Failed to add subreddit');
+        }
+    } catch (error) {
+        console.error('Error adding subreddit:', error);
+        alert('❌ Failed to add subreddit. Please try again.');
+    }
+}
+
+// Remove subreddit
+async function removeSubreddit(index) {
+    if (!confirm('Remove this subreddit?')) return;
+    
+    try {
+        const subreddits = Array.isArray(clientData.target_subreddits) 
+            ? clientData.target_subreddits 
+            : clientData.target_subreddits.split(',');
+        
+        subreddits.splice(index, 1);
+        
+        const response = await fetch(`${API_URL}/api/clients/${CLIENT_ID}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ target_subreddits: subreddits })
+        });
+        
+        if (response.ok) {
+            clientData.target_subreddits = subreddits;
+            loadSubreddits();
+            alert('✅ Subreddit removed successfully!');
+        } else {
+            throw new Error('Failed to remove subreddit');
+        }
+    } catch (error) {
+        console.error('Error removing subreddit:', error);
+        alert('❌ Failed to remove subreddit. Please try again.');
+    }
 }
