@@ -203,10 +203,10 @@ async function loadDocumentsList() {
         const response = await fetch(`${API_URL}/api/clients/${CLIENT_ID}/documents`);
         if (!response.ok) throw new Error('Failed to load documents');
         
-        const data = await response.json();
+        const documents = await response.json();
         const container = document.getElementById('documentsList');
         
-        if (!data.documents || data.documents.length === 0) {
+        if (!documents || documents.length === 0) {
             container.innerHTML = '<p class="text-center text-muted">No documents uploaded yet</p>';
             return;
         }
@@ -223,14 +223,14 @@ async function loadDocumentsList() {
                     </tr>
                 </thead>
                 <tbody>
-                    ${data.documents.map(doc => `
+                    ${documents.map(doc => `
                         <tr>
-                            <td><i class="fas fa-file"></i> ${doc.file_name}</td>
+                            <td><i class="fas fa-file"></i> ${doc.filename}</td>
                             <td><span class="badge-custom badge-primary">${doc.file_type}</span></td>
                             <td>${(doc.file_size / 1024 / 1024).toFixed(2)} MB</td>
                             <td>${new Date(doc.uploaded_at).toLocaleDateString()}</td>
                             <td>
-                                <button class="btn btn-sm btn-danger" onclick="deleteDocument('${doc.document_id}')">
+                                <button class="btn btn-sm btn-danger" onclick="deleteDocument('${doc.id}')">
                                     <i class="fas fa-trash"></i> Delete
                                 </button>
                             </td>
