@@ -173,7 +173,7 @@ async function uploadDocuments(files) {
         formData.append('client_id', CLIENT_ID);
         files.forEach(file => formData.append('files', file));
         
-        const response = await fetch(`${API_URL}/api/client-onboarding/upload-files`, {
+        const response = await fetch(`${API_URL}/api/clients/${CLIENT_ID}/documents/upload`, {
             method: 'POST',
             body: formData
         });
