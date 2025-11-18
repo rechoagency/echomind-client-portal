@@ -910,3 +910,20 @@ window.handleProfileSubredditInput = handleProfileSubredditInput;
 window.removeProfileSubreddit = removeProfileSubreddit;
 window.removeFile = removeFile;
 window.submitForm = submitForm;
+
+// ============================================
+// ONBOARDING SLIDER FUNCTIONS
+// ============================================
+
+// Update slider display values in onboarding form
+function updateOnboardingSlider(elementId, value, type) {
+    if (type === 'replyPost') {
+        // Update reply/post split
+        document.getElementById('replyValueOnboard').textContent = value + '%';
+        document.getElementById('postValueOnboard').textContent = (100 - value) + '%';
+    } else {
+        // Update single value
+        document.getElementById(elementId).textContent = value + '%';
+    }
+}
+
