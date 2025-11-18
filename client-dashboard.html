@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EchoMind - Client Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .main-container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .header-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+        .header-card h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a202c;
+            margin: 0;
+        }
+        .header-card .company-name {
+            color: #667eea;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .tabs-card {
+            background: white;
+            border-radius: 20px;
+            padding: 0;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        .nav-tabs {
+            border-bottom: 2px solid #e9ecef;
+            padding: 20px 30px 0;
+        }
+        .nav-tabs .nav-link {
+            border: none;
+            color: #718096;
+            font-weight: 600;
+            padding: 15px 25px;
+            margin-right: 10px;
+            border-radius: 10px 10px 0 0;
+            transition: all 0.3s;
+        }
+        .nav-tabs .nav-link:hover {
+            color: #667eea;
+            background: #f7fafc;
+        }
+        .nav-tabs .nav-link.active {
+            color: #667eea;
+            background: white;
+            border-bottom: 3px solid #667eea;
+        }
+        .tab-content {
+            padding: 30px;
+        }
+        .slider-container {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        .slider-container h4 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 15px;
+        }
+        .slider-container p {
+            color: #718096;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #e2e8f0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.5);
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+        .slider-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .btn-save {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #718096;
+        }
+        .loading i {
+            font-size: 48px;
+            color: #667eea;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .info-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        .info-card h5 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 10px;
+        }
+        .info-card p {
+            color: #718096;
+            margin: 0;
+            font-size: 14px;
+        }
+        .badge-custom {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 5px 5px 5px 0;
+        }
+        .badge-primary {
+            background: #e6f0ff;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Header -->
+        <div class="header-card">
+            <h1><i class="fas fa-chart-line"></i> EchoMind Dashboard</h1>
+            <p class="company-name" id="companyName">Loading...</p>
+        </div>
+
+        <!-- Tabs Container -->
+        <div class="tabs-card">
+            <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#overview">
+                        <i class="fas fa-home"></i> Overview
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#strategy">
+                        <i class="fas fa-sliders-h"></i> Strategy
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#keywords">
+                        <i class="fas fa-key"></i> Keywords
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#subreddits">
+                        <i class="fas fa-comments"></i> Subreddits
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <!-- Overview Tab -->
+                <div class="tab-pane fade show active" id="overview">
+                    <div id="overviewLoading" class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>Loading client data...</p>
+                    </div>
+                    <div id="overviewContent" style="display:none;">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="info-card">
+                                    <h5><i class="fas fa-building"></i> Company Information</h5>
+                                    <p><strong>Industry:</strong> <span id="industry">-</span></p>
+                                    <p><strong>Website:</strong> <span id="website">-</span></p>
+                                    <p><strong>Contact:</strong> <span id="contactEmail">-</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-card">
+                                    <h5><i class="fas fa-cog"></i> Configuration</h5>
+                                    <p><strong>Posting Frequency:</strong> <span id="postingFrequency">-</span>/week</p>
+                                    <p><strong>Status:</strong> <span id="status" class="badge-custom badge-primary">Active</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Strategy Tab -->
+                <div class="tab-pane fade" id="strategy">
+                    <h3 class="mb-4">Content Strategy Controls</h3>
+                    
+                    <!-- Reply vs Post Slider -->
+                    <div class="slider-container">
+                        <h4><i class="fas fa-balance-scale"></i> Reply vs Post Ratio</h4>
+                        <p>Control the balance between comment replies and new posts</p>
+                        <input type="range" id="replyPostSlider" min="0" max="100" value="70" 
+                               oninput="updateSliderValue('replyPostValue', this.value, 'replyPost')">
+                        <div class="row mt-3">
+                            <div class="col-6 text-center">
+                                <strong>Replies</strong>
+                                <div class="slider-value" id="replyValue">70%</div>
+                            </div>
+                            <div class="col-6 text-center">
+                                <strong>Posts</strong>
+                                <div class="slider-value" id="postValue">30%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Brand Mention Slider -->
+                    <div class="slider-container">
+                        <h4><i class="fas fa-tag"></i> Brand Mention Frequency</h4>
+                        <p>How often to mention your brand across ALL content</p>
+                        <input type="range" id="brandMentionSlider" min="0" max="100" value="30"
+                               oninput="updateSliderValue('brandMentionValue', this.value)">
+                        <div class="slider-value" id="brandMentionValue">30%</div>
+                    </div>
+
+                    <!-- Product Mention Slider -->
+                    <div class="slider-container">
+                        <h4><i class="fas fa-box"></i> Product Mention Frequency</h4>
+                        <p>How often to mention specific products (only when relevance ≥75%)</p>
+                        <input type="range" id="productMentionSlider" min="0" max="100" value="20"
+                               oninput="updateSliderValue('productMentionValue', this.value)">
+                        <div class="slider-value" id="productMentionValue">20%</div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button class="btn-save" onclick="saveStrategy()">
+                            <i class="fas fa-save"></i> Save Strategy
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Keywords Tab -->
+                <div class="tab-pane fade" id="keywords">
+                    <h3 class="mb-4">Target Keywords</h3>
+                    <div id="keywordsList" class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>Loading keywords...</p>
+                    </div>
+                </div>
+
+                <!-- Subreddits Tab -->
+                <div class="tab-pane fade" id="subreddits">
+                    <h3 class="mb-4">Target Subreddits</h3>
+                    <div id="subredditsList" class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>Loading subreddits...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/client-dashboard.js"></script>
+</body>
+</html>
