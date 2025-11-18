@@ -88,6 +88,13 @@
             color: #1a202c;
         }
         
+        .stat-card .description {
+            font-size: 12px;
+            color: #a0aec0;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+        
         .clients-section {
             background: white;
             border-radius: 16px;
@@ -103,17 +110,17 @@
         
         .client-card {
             background: #f7fafc;
-            border: 2px solid #e2e8f0;
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 15px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
+            position: relative;
         }
         
         .client-card:hover {
-            border-color: #667eea;
-            transform: translateX(5px);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         
         .client-header {
@@ -124,12 +131,12 @@
         }
         
         .client-info h3 {
-            font-size: 20px;
+            font-size: 18px;
             color: #1a202c;
             margin-bottom: 5px;
         }
         
-        .client-info .industry {
+        .industry {
             color: #718096;
             font-size: 14px;
         }
@@ -139,7 +146,6 @@
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
-            text-transform: uppercase;
         }
         
         .status-active {
@@ -147,8 +153,8 @@
             color: #22543d;
         }
         
-        .status-processing {
-            background: #fed7aa;
+        .status-pending {
+            background: #feebc8;
             color: #7c2d12;
         }
         
@@ -162,16 +168,109 @@
             text-align: center;
         }
         
-        .metric .metric-value {
+        .metric-value {
             font-size: 24px;
             font-weight: 700;
             color: #667eea;
         }
         
-        .metric .metric-label {
+        .metric-label {
             font-size: 12px;
             color: #718096;
-            margin-top: 5px;
+            margin-top: 4px;
+        }
+        
+        .btn-delete {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #fc8181;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+        
+        .btn-delete:hover {
+            background: #f56565;
+            transform: scale(1.05);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .modal-content h3 {
+            font-size: 24px;
+            color: #1a202c;
+            margin-bottom: 15px;
+        }
+        
+        .modal-content p {
+            color: #718096;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-confirm {
+            background: #fc8181;
+            color: white;
+        }
+        
+        .btn-confirm:hover {
+            background: #f56565;
+        }
+        
+        .btn-cancel {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        
+        .btn-cancel:hover {
+            background: #cbd5e0;
         }
         
         .loading {
@@ -183,105 +282,16 @@
         .empty-state {
             text-align: center;
             padding: 60px 20px;
-            color: #718096;
         }
         
         .empty-state h3 {
-            font-size: 20px;
+            font-size: 24px;
+            color: #1a202c;
             margin-bottom: 10px;
         }
         
-        /* Client Detail Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            padding: 20px;
-            overflow-y: auto;
-        }
-        
-        .modal.active {
-            display: flex;
-            justify-content: center;
-            align-items: start;
-            padding-top: 50px;
-        }
-        
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            padding: 40px;
-            max-width: 1200px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-        
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 30px;
-            cursor: pointer;
+        .empty-state p {
             color: #718096;
-        }
-        
-        .opportunities-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        
-        .opportunities-table th {
-            background: #f7fafc;
-            padding: 12px;
-            text-align: left;
-            font-weight: 600;
-            color: #1a202c;
-            border-bottom: 2px solid #e2e8f0;
-        }
-        
-        .opportunities-table td {
-            padding: 12px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        
-        .priority-badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-        
-        .priority-URGENT {
-            background: #fed7d7;
-            color: #c53030;
-        }
-        
-        .priority-HIGH {
-            background: #feebc8;
-            color: #c05621;
-        }
-        
-        .priority-MEDIUM {
-            background: #bee3f8;
-            color: #2c5282;
-        }
-        
-        .priority-LOW {
-            background: #e2e8f0;
-            color: #4a5568;
         }
     </style>
 </head>
@@ -303,18 +313,22 @@
             <div class="stat-card">
                 <div class="label">Total Clients</div>
                 <div class="value" id="totalClients">0</div>
+                <div class="description">All clients onboarded to EchoMind platform</div>
             </div>
             <div class="stat-card">
                 <div class="label">Active Clients</div>
                 <div class="value" id="activeClients">0</div>
+                <div class="description">Clients with active campaigns and posting enabled</div>
             </div>
             <div class="stat-card">
                 <div class="label">Total Opportunities</div>
                 <div class="value" id="totalOpportunities">0</div>
+                <div class="description">Brand mentions + high-engagement posts across all clients</div>
             </div>
             <div class="stat-card">
                 <div class="label">High Priority</div>
                 <div class="value" id="highPriority">0</div>
+                <div class="description">Urgent mentions or viral posts requiring immediate responses</div>
             </div>
         </div>
         
@@ -327,21 +341,21 @@
         </div>
     </div>
     
-    <!-- Client Detail Modal -->
-    <div class="modal" id="clientModal">
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteModal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle">Client Details</h2>
-                <button class="modal-close" onclick="closeModal()">×</button>
-            </div>
-            <div id="modalBody">
-                <!-- Content loaded dynamically -->
+            <h3>⚠️ Delete Client?</h3>
+            <p id="deleteMessage">Are you sure you want to delete this client? This action cannot be undone.</p>
+            <div class="modal-buttons">
+                <button class="btn btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+                <button class="btn btn-confirm" onclick="confirmDelete()">Delete Client</button>
             </div>
         </div>
     </div>
     
     <script>
         const API_URL = 'https://echomind-backend-production.up.railway.app';
+        let clientToDelete = null;
         
         // Load dashboard on page load
         document.addEventListener('DOMContentLoaded', function() {
@@ -394,7 +408,10 @@
             }
             
             container.innerHTML = clients.map(client => `
-                <div class="client-card" onclick="viewClient('${client.client_id}')">
+                <div class="client-card" onclick="viewClient('${client.client_id}', event)">
+                    <button class="btn-delete" onclick="deleteClient('${client.client_id}', '${client.company_name}', event)">
+                        🗑️ Delete
+                    </button>
                     <div class="client-header">
                         <div class="client-info">
                             <h3>${client.company_name}</h3>
@@ -426,114 +443,48 @@
             `).join('');
         }
         
-        async function viewClient(clientId) {
-            // Navigate to client-specific dashboard
+        function viewClient(clientId, event) {
+            // Don't navigate if clicking delete button
+            if (event && event.target.closest('.btn-delete')) {
+                return;
+            }
             window.location.href = `/client-dashboard.html?client_id=${clientId}`;
         }
         
-        async function viewClientModal(clientId) {
-            // Keep modal function for future use if needed
-            const modal = document.getElementById('clientModal');
-            const modalBody = document.getElementById('modalBody');
-            
-            modal.classList.add('active');
-            modalBody.innerHTML = '<div class="loading">Loading client details...</div>';
+        function deleteClient(clientId, companyName, event) {
+            event.stopPropagation();
+            clientToDelete = clientId;
+            document.getElementById('deleteMessage').textContent = 
+                `Are you sure you want to delete "${companyName}"? This will remove all associated data, documents, and settings. This action cannot be undone.`;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+        
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            clientToDelete = null;
+        }
+        
+        async function confirmDelete() {
+            if (!clientToDelete) return;
             
             try {
-                // Load client metrics
-                const metricsResponse = await fetch(`${API_URL}/api/dashboard/client/${clientId}/metrics`);
-                const metricsData = await metricsResponse.json();
+                const response = await fetch(`${API_URL}/api/admin/clients/${clientToDelete}`, {
+                    method: 'DELETE'
+                });
                 
-                // Load opportunities
-                const oppsResponse = await fetch(`${API_URL}/api/dashboard/client/${clientId}/opportunities?limit=20`);
-                const oppsData = await oppsResponse.json();
-                
-                if (metricsData.success && oppsData.success) {
-                    renderClientDetail(metricsData, oppsData);
+                if (response.ok) {
+                    closeDeleteModal();
+                    // Reload dashboard
+                    loadDashboard();
+                    alert('✅ Client deleted successfully');
+                } else {
+                    const error = await response.json();
+                    alert(`❌ Failed to delete client: ${error.detail || 'Unknown error'}`);
                 }
-                
             } catch (error) {
-                console.error('Error loading client:', error);
-                modalBody.innerHTML = `<div class="empty-state">Error loading client details</div>`;
+                console.error('Error deleting client:', error);
+                alert(`❌ Error: ${error.message}`);
             }
-        }
-        
-        function renderClientDetail(metrics, opportunities) {
-            const client = metrics.client;
-            const m = metrics.metrics;
-            
-            document.getElementById('modalTitle').textContent = client.company_name;
-            document.getElementById('modalBody').innerHTML = `
-                <div style="margin-bottom: 30px;">
-                    <h3 style="margin-bottom: 15px;">📊 Performance Metrics</h3>
-                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
-                        <div>
-                            <div style="font-size: 32px; font-weight: 700; color: #667eea;">${m.average_scores.composite}%</div>
-                            <div style="color: #718096;">Avg Composite Score</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 32px; font-weight: 700; color: #667eea;">${m.average_scores.buying_intent}%</div>
-                            <div style="color: #718096;">Buying Intent</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 32px; font-weight: 700; color: #667eea;">${m.average_scores.organic_lift}%</div>
-                            <div style="color: #718096;">Organic Lift</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 32px; font-weight: 700; color: #667eea;">${m.product_matchback_rate}%</div>
-                            <div style="color: #718096;">Matchback Rate</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div style="margin-bottom: 30px;">
-                    <h3 style="margin-bottom: 15px;">🎯 Priority Distribution</h3>
-                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
-                        <div style="text-align: center; padding: 15px; background: #fed7d7; border-radius: 8px;">
-                            <div style="font-size: 24px; font-weight: 700;">${m.opportunities_by_priority.urgent}</div>
-                            <div style="font-size: 12px;">URGENT</div>
-                        </div>
-                        <div style="text-align: center; padding: 15px; background: #feebc8; border-radius: 8px;">
-                            <div style="font-size: 24px; font-weight: 700;">${m.opportunities_by_priority.high}</div>
-                            <div style="font-size: 12px;">HIGH</div>
-                        </div>
-                        <div style="text-align: center; padding: 15px; background: #bee3f8; border-radius: 8px;">
-                            <div style="font-size: 24px; font-weight: 700;">${m.opportunities_by_priority.medium}</div>
-                            <div style="font-size: 12px;">MEDIUM</div>
-                        </div>
-                        <div style="text-align: center; padding: 15px; background: #e2e8f0; border-radius: 8px;">
-                            <div style="font-size: 24px; font-weight: 700;">${m.opportunities_by_priority.low}</div>
-                            <div style="font-size: 12px;">LOW</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <h3 style="margin-bottom: 15px;">🔥 Top Opportunities</h3>
-                <table class="opportunities-table">
-                    <thead>
-                        <tr>
-                            <th>Priority</th>
-                            <th>Subreddit</th>
-                            <th>Title</th>
-                            <th>Score</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${opportunities.opportunities.map(opp => `
-                            <tr>
-                                <td><span class="priority-badge priority-${opp.priority}">${opp.priority}</span></td>
-                                <td>r/${opp.subreddit}</td>
-                                <td>${opp.thread_title}</td>
-                                <td><strong>${Math.round(opp.opportunity_score || 0)}</strong></td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-        }
-        
-        function closeModal() {
-            document.getElementById('clientModal').classList.remove('active');
         }
         
         function addNewClient() {
