@@ -1,0 +1,384 @@
+<!-- ============================================================================
+     ANALYTICS TAB - Add this to index.html after Strategy tab
+     ============================================================================ -->
+
+<!-- Add to navigation (after Strategy button) -->
+<button onclick="switchView('analytics')" id="nav-analytics" class="px-4 py-2 text-gray-700 hover:text-gray-900">
+    Analytics
+</button>
+
+<!-- Analytics View -->
+<div id="analytics-view" class="view hidden">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <h2 class="text-3xl font-bold text-gray-900 mb-8">📊 Content Analytics & Strategy Compliance</h2>
+
+        <!-- Time Period Selector -->
+        <div class="mb-6 flex items-center gap-4">
+            <label class="font-semibold text-gray-700">Time Period:</label>
+            <select id="analytics-period" onchange="loadAnalytics()" class="px-4 py-2 border border-gray-300 rounded-lg">
+                <option value="7">Last 7 Days</option>
+                <option value="14">Last 14 Days</option>
+                <option value="30" selected>Last 30 Days</option>
+                <option value="60">Last 60 Days</option>
+                <option value="90">Last 90 Days</option>
+            </select>
+            <button onclick="loadAnalytics()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                🔄 Refresh
+            </button>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <!-- Total Delivered -->
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div class="text-sm text-gray-600 mb-2">Total Pieces Delivered</div>
+                <div class="text-3xl font-bold text-gray-900" id="total-delivered">--</div>
+                <div class="text-xs text-gray-500 mt-2">
+                    <span id="mon-deliveries">--</span> Mon / <span id="thu-deliveries">--</span> Thu
+                </div>
+            </div>
+
+            <!-- Reply vs Post -->
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div class="text-sm text-gray-600 mb-2">Reply vs Post</div>
+                <div class="text-2xl font-bold text-gray-900">
+                    <span id="reply-pct">--</span>% / <span id="post-pct">--</span>%
+                </div>
+                <div class="text-xs mt-2" id="reply-compliance-badge">
+                    <span class="px-2 py-1 rounded bg-gray-100 text-gray-600">No target set</span>
+                </div>
+            </div>
+
+            <!-- Brand Mentions -->
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div class="text-sm text-gray-600 mb-2">Brand Mentions</div>
+                <div class="text-3xl font-bold text-blue-600" id="brand-pct">--</div>
+                <div class="text-xs text-gray-500 mt-2">
+                    <span id="brand-count">--</span> of <span id="brand-total">--</span> pieces
+                </div>
+                <div class="text-xs mt-2" id="brand-compliance-badge">
+                    <span class="px-2 py-1 rounded bg-gray-100 text-gray-600">No target set</span>
+                </div>
+            </div>
+
+            <!-- Product Mentions -->
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div class="text-sm text-gray-600 mb-2">Product Mentions</div>
+                <div class="text-3xl font-bold text-purple-600" id="product-pct">--</div>
+                <div class="text-xs text-gray-500 mt-2">
+                    <span id="product-count">--</span> of <span id="product-total">--</span> pieces
+                </div>
+                <div class="text-xs mt-2" id="product-compliance-badge">
+                    <span class="px-2 py-1 rounded bg-gray-100 text-gray-600">No target set</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Strategy Compliance Section -->
+        <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm mb-8">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">🎯 Strategy Compliance</h3>
+            <p class="text-sm text-gray-600 mb-6">How well are your slider settings being followed?</p>
+
+            <div class="space-y-4">
+                <!-- Reply/Post Compliance -->
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-sm font-medium text-gray-700">Reply vs Post Ratio</span>
+                        <span class="text-sm text-gray-600" id="reply-variance-text">--</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-4">
+                        <div id="reply-compliance-bar" class="bg-green-500 h-4 rounded-full transition-all" style="width: 0%"></div>
+                    </div>
+                    <div class="flex justify-between mt-1 text-xs text-gray-500">
+                        <span>Target: <span id="target-reply">--</span>% replies</span>
+                        <span>Actual: <span id="actual-reply">--</span>% replies</span>
+                    </div>
+                </div>
+
+                <!-- Brand Mention Compliance -->
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-sm font-medium text-gray-700">Brand Mention Rate</span>
+                        <span class="text-sm text-gray-600" id="brand-variance-text">--</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-4">
+                        <div id="brand-compliance-bar" class="bg-blue-500 h-4 rounded-full transition-all" style="width: 0%"></div>
+                    </div>
+                    <div class="flex justify-between mt-1 text-xs text-gray-500">
+                        <span>Target: <span id="target-brand">--</span>%</span>
+                        <span>Actual: <span id="actual-brand">--</span>%</span>
+                    </div>
+                </div>
+
+                <!-- Product Mention Compliance -->
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-sm font-medium text-gray-700">Product Mention Rate</span>
+                        <span class="text-sm text-gray-600" id="product-variance-text">--</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-4">
+                        <div id="product-compliance-bar" class="bg-purple-500 h-4 rounded-full transition-all" style="width: 0%"></div>
+                    </div>
+                    <div class="flex justify-between mt-1 text-xs text-gray-500">
+                        <span>Target: <span id="target-product">--</span>%</span>
+                        <span>Actual: <span id="actual-product">--</span>%</span>
+                    </div>
+                </div>
+
+                <!-- Overall Compliance Score -->
+                <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-sm font-medium text-gray-700">Overall Compliance Score</div>
+                            <div class="text-xs text-gray-500 mt-1">Based on variance from target settings</div>
+                        </div>
+                        <div class="text-4xl font-bold" id="overall-compliance-score">
+                            <span class="text-gray-300">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Usage Tracking Section -->
+        <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm mb-8">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">📝 Content Usage Tracking</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="text-center p-4 bg-green-50 rounded-lg">
+                    <div class="text-3xl font-bold text-green-600" id="used-count">--</div>
+                    <div class="text-sm text-gray-600 mt-1">Used (Posted)</div>
+                </div>
+                <div class="text-center p-4 bg-gray-50 rounded-lg">
+                    <div class="text-3xl font-bold text-gray-600" id="pending-count">--</div>
+                    <div class="text-sm text-gray-600 mt-1">Pending Review</div>
+                </div>
+                <div class="text-center p-4 bg-red-50 rounded-lg">
+                    <div class="text-3xl font-bold text-red-600" id="skipped-count">--</div>
+                    <div class="text-sm text-gray-600 mt-1">Skipped</div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <div class="text-sm text-gray-600 mb-2">Usage Rate</div>
+                <div class="text-4xl font-bold text-gray-900" id="usage-rate">--%</div>
+                <div class="text-xs text-gray-500 mt-2">Percentage of delivered content that was actually posted</div>
+            </div>
+        </div>
+
+        <!-- Top Performers Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <!-- Top Subreddits -->
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">🏆 Top Subreddits</h3>
+                <div id="top-subreddits-list" class="space-y-3">
+                    <div class="text-sm text-gray-500 text-center py-8">Loading...</div>
+                </div>
+            </div>
+
+            <!-- Top Products -->
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">🎁 Top Products Mentioned</h3>
+                <div id="top-products-list" class="space-y-3">
+                    <div class="text-sm text-gray-500 text-center py-8">Loading...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Deliveries Table -->
+        <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">📋 Recent Deliveries</h3>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead>
+                        <tr class="bg-gray-50">
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Subreddit</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Brand</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Priority</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-deliveries-body" class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td colspan="7" class="px-4 py-8 text-center text-sm text-gray-500">Loading deliveries...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Add to existing JavaScript file (app.js) -->
+<script>
+// Analytics Dashboard Functions
+
+let currentClientId = null; // Set this when client logs in
+
+async function loadAnalytics() {
+    const days = document.getElementById('analytics-period').value;
+    
+    if (!currentClientId) {
+        console.error('No client ID set');
+        return;
+    }
+    
+    try {
+        // Load summary
+        const summaryResponse = await fetch(`/api/analytics/${currentClientId}/summary?days=${days}`);
+        const summary = await summaryResponse.json();
+        
+        updateSummaryCards(summary);
+        updateComplianceSection(summary);
+        updateUsageTracking(summary);
+        updateTopPerformers(summary);
+        
+        // Load recent deliveries
+        const deliveriesResponse = await fetch(`/api/analytics/${currentClientId}/delivered?limit=20`);
+        const deliveries = await deliveriesResponse.json();
+        
+        updateRecentDeliveries(deliveries.content);
+        
+    } catch (error) {
+        console.error('Error loading analytics:', error);
+    }
+}
+
+function updateSummaryCards(summary) {
+    document.getElementById('total-delivered').textContent = summary.total_delivered;
+    document.getElementById('mon-deliveries').textContent = summary.monday_deliveries;
+    document.getElementById('thu-deliveries').textContent = summary.thursday_deliveries;
+    
+    document.getElementById('reply-pct').textContent = summary.reply_percentage.toFixed(1);
+    document.getElementById('post-pct').textContent = summary.post_percentage.toFixed(1);
+    
+    document.getElementById('brand-pct').textContent = summary.brand_mention_percentage.toFixed(1) + '%';
+    document.getElementById('brand-count').textContent = summary.brand_mentions;
+    document.getElementById('brand-total').textContent = summary.total_delivered;
+    
+    document.getElementById('product-pct').textContent = summary.product_mention_percentage.toFixed(1) + '%';
+    document.getElementById('product-count').textContent = summary.product_mentions;
+    document.getElementById('product-total').textContent = summary.total_delivered;
+}
+
+function updateComplianceSection(summary) {
+    // Reply compliance
+    if (summary.target_reply_percentage !== null) {
+        document.getElementById('target-reply').textContent = summary.target_reply_percentage.toFixed(1);
+        document.getElementById('actual-reply').textContent = summary.reply_percentage.toFixed(1);
+        
+        const replyVariance = summary.reply_variance;
+        document.getElementById('reply-variance-text').textContent = 
+            Math.abs(replyVariance) <= 5 ? '✓ On Target' : `${replyVariance > 0 ? '+' : ''}${replyVariance.toFixed(1)}% variance`;
+        
+        const replyCompliance = Math.max(0, 100 - Math.abs(replyVariance));
+        document.getElementById('reply-compliance-bar').style.width = replyCompliance + '%';
+    }
+    
+    // Brand compliance
+    if (summary.target_brand_percentage !== null) {
+        document.getElementById('target-brand').textContent = summary.target_brand_percentage.toFixed(1);
+        document.getElementById('actual-brand').textContent = summary.brand_mention_percentage.toFixed(1);
+        
+        const brandVariance = summary.brand_variance;
+        document.getElementById('brand-variance-text').textContent = 
+            Math.abs(brandVariance) <= 5 ? '✓ On Target' : `${brandVariance > 0 ? '+' : ''}${brandVariance.toFixed(1)}% variance`;
+        
+        const brandCompliance = Math.max(0, 100 - Math.abs(brandVariance));
+        document.getElementById('brand-compliance-bar').style.width = brandCompliance + '%';
+    }
+    
+    // Product compliance
+    if (summary.target_product_percentage !== null) {
+        document.getElementById('target-product').textContent = summary.target_product_percentage.toFixed(1);
+        document.getElementById('actual-product').textContent = summary.product_mention_percentage.toFixed(1);
+        
+        const productVariance = summary.product_variance;
+        document.getElementById('product-variance-text').textContent = 
+            Math.abs(productVariance) <= 5 ? '✓ On Target' : `${productVariance > 0 ? '+' : ''}${productVariance.toFixed(1)}% variance`;
+        
+        const productCompliance = Math.max(0, 100 - Math.abs(productVariance));
+        document.getElementById('product-compliance-bar').style.width = productCompliance + '%';
+    }
+    
+    // Overall score (placeholder - would calculate from variance data)
+    const overallScore = 85; // TODO: Calculate from actual variance
+    document.getElementById('overall-compliance-score').innerHTML = 
+        `<span class="text-green-600">${overallScore}</span>`;
+}
+
+function updateUsageTracking(summary) {
+    document.getElementById('used-count').textContent = summary.used;
+    document.getElementById('pending-count').textContent = summary.pending;
+    document.getElementById('skipped-count').textContent = summary.skipped;
+    document.getElementById('usage-rate').textContent = summary.usage_rate.toFixed(1) + '%';
+}
+
+function updateTopPerformers(summary) {
+    // Top subreddits
+    const subredditsHtml = summary.top_subreddits.length > 0 
+        ? summary.top_subreddits.map(sub => `
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                <span class="font-medium text-gray-900">${sub.subreddit}</span>
+                <span class="text-sm text-gray-600">${sub.count} pieces</span>
+            </div>
+        `).join('')
+        : '<div class="text-sm text-gray-500 text-center py-8">No data yet</div>';
+    
+    document.getElementById('top-subreddits-list').innerHTML = subredditsHtml;
+    
+    // Top products
+    const productsHtml = summary.top_products.length > 0
+        ? summary.top_products.map(prod => `
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                <span class="font-medium text-gray-900">${prod.product}</span>
+                <span class="text-sm text-gray-600">${prod.count} mentions</span>
+            </div>
+        `).join('')
+        : '<div class="text-sm text-gray-500 text-center py-8">No products mentioned yet</div>';
+    
+    document.getElementById('top-products-list').innerHTML = productsHtml;
+}
+
+function updateRecentDeliveries(deliveries) {
+    const tableBody = document.getElementById('recent-deliveries-body');
+    
+    if (deliveries.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-sm text-gray-500">No deliveries yet</td></tr>';
+        return;
+    }
+    
+    const rows = deliveries.map(d => {
+        const date = new Date(d.delivery_date).toLocaleDateString();
+        const statusClass = d.status === 'used' ? 'text-green-600' : d.status === 'skipped' ? 'text-red-600' : 'text-gray-600';
+        
+        return `
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3 text-sm text-gray-900">${date}</td>
+                <td class="px-4 py-3 text-sm text-gray-900">${d.subreddit}</td>
+                <td class="px-4 py-3 text-sm text-gray-600">${d.content_type}</td>
+                <td class="px-4 py-3 text-sm">${d.brand_mentioned ? '✓' : '—'}</td>
+                <td class="px-4 py-3 text-sm">${d.product_mentioned ? '✓' : '—'}</td>
+                <td class="px-4 py-3 text-sm ${statusClass} font-medium">${d.status}</td>
+                <td class="px-4 py-3 text-sm text-gray-600">${d.overall_priority || '—'}</td>
+            </tr>
+        `;
+    }).join('');
+    
+    tableBody.innerHTML = rows;
+}
+
+// Auto-load analytics when view is switched
+const originalSwitchView = switchView;
+switchView = function(view) {
+    originalSwitchView(view);
+    if (view === 'analytics') {
+        loadAnalytics();
+    }
+};
+</script>
