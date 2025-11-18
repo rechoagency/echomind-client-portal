@@ -176,6 +176,27 @@
             background: #e6f0ff;
             color: #667eea;
         }
+        .btn-remove-badge {
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            padding: 0;
+            margin-left: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            line-height: 1;
+            transition: all 0.2s;
+        }
+        .btn-remove-badge:hover {
+            background: #dc2626;
+            transform: scale(1.1);
+        }
+        .badge-custom {
+            position: relative;
+        }
     </style>
 </head>
 <body>
@@ -378,6 +399,48 @@
                             <div class="loading">
                                 <i class="fas fa-spinner"></i>
                                 <p>Loading activity...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- AUTO-RESPONSES LOG SECTION - INSERT AFTER ACTIVITY FEED -->
+                    <div class="info-card mt-4">
+                        <h5 class="mb-3"><i class="fas fa-robot"></i> Auto-Responses Log</h5>
+                        <p class="text-muted">Review all automated responses sent to brand mentions and replies</p>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-5">
+                                <label><strong>Filter by Date:</strong></label>
+                                <input type="date" id="autoResponsesStartDate" class="form-control mb-2">
+                                <input type="date" id="autoResponsesEndDate" class="form-control">
+                            </div>
+                            <div class="col-md-3">
+                                <label>&nbsp;</label>
+                                <button class="btn btn-primary d-block" onclick="filterAutoResponses()">
+                                    <i class="fas fa-filter"></i> Filter
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="autoResponsesList" style="max-height: 600px; overflow-y: auto;">
+                            <div class="loading">
+                                <i class="fas fa-spinner"></i>
+                                <p>Loading auto-responses...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- NEGATIVE BRAND MENTIONS SECTION -->
+                    <div class="info-card mt-4">
+                        <h5 class="mb-3">
+                            <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i> 
+                            Negative Brand Mentions
+                        </h5>
+                        <p class="text-muted">Monitor and respond to negative sentiment mentions</p>
+                        
+                        <div id="negativeMentionsList" style="max-height: 500px; overflow-y: auto;">
+                            <div class="loading">
+                                <i class="fas fa-spinner"></i>
+                                <p>Scanning for negative mentions...</p>
                             </div>
                         </div>
                     </div>
