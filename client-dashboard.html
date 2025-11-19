@@ -629,13 +629,28 @@
                     <div class="info-card mb-4">
                         <h5><i class="fas fa-exclamation-triangle"></i> Special Instructions</h5>
                         <p class="text-muted">Medical disclaimers, legal guidelines, exclusions, seasonal instructions, etc.</p>
-                        <textarea id="specialInstructions" rows="10" class="form-control" 
-                                  style="font-family: 'Courier New', monospace; font-size: 14px;"
-                                  placeholder="Example:\n- MEDICAL: Always include 'Consult your doctor before...' for health advice\n- LEGAL: Never claim products 'cure' or 'treat' conditions\n- EXCLUSIONS: Do not mention competitor brands X, Y, Z\n- SEASONAL: Holiday gift guide season Nov 15 - Dec 24"></textarea>
-                        <div class="text-end mt-3">
-                            <button class="btn-save" onclick="saveSpecialInstructions()">
-                                <i class="fas fa-save"></i> Save Special Instructions
-                            </button>
+                        
+                        <!-- Existing Instructions -->
+                        <div id="specialInstructionsContainer" class="mb-4">
+                            <div class="loading">
+                                <i class="fas fa-spinner"></i>
+                                <p>Loading special instructions...</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Add New Instruction -->
+                        <div class="card" style="border: 2px dashed #667eea; background: #f8f9fa;">
+                            <div class="card-body">
+                                <h6 class="text-primary"><i class="fas fa-plus-circle"></i> Add New Special Instruction</h6>
+                                <textarea id="newSpecialInstruction" rows="4" class="form-control mb-3" 
+                                          style="font-family: 'Courier New', monospace; font-size: 14px;"
+                                          placeholder="Example:\n- MEDICAL: Always include 'Consult your doctor before...' for health advice\n- LEGAL: Never claim products 'cure' or 'treat' conditions\n- EXCLUSIONS: Do not mention competitor brands X, Y, Z\n- SEASONAL: Holiday gift guide season Nov 15 - Dec 24"></textarea>
+                                <div class="text-end">
+                                    <button class="btn btn-primary" onclick="addSpecialInstruction()">
+                                        <i class="fas fa-plus"></i> Add Instruction
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -662,6 +677,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/client-dashboard.js"></script>
+    <script src="js/documents-and-settings.js"></script>
     <script src="js/client-dashboard-NEW-FEATURES.js"></script>
 </body>
 </html>
