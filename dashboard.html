@@ -468,8 +468,9 @@
             if (!clientToDelete) return;
             
             try {
-                const response = await fetch(`${API_URL}/api/admin/clients/${clientToDelete}`, {
-                    method: 'DELETE'
+                const response = await fetch(`${API_URL}/api/admin/clients/${clientToDelete}?confirmation=true`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
                 });
                 
                 if (response.ok) {

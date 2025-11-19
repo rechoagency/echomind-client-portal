@@ -284,6 +284,65 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        <!-- Current System Settings Section -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="info-card">
+                                    <h5><i class="fas fa-sliders-h"></i> Current System Settings</h5>
+                                    <p class="text-muted mb-3">Your active configuration and targeting parameters</p>
+                                    
+                                    <div class="row">
+                                        <!-- Strategy Ratios -->
+                                        <div class="col-md-6 mb-3">
+                                            <h6 class="text-primary"><i class="fas fa-balance-scale"></i> Content Strategy</h6>
+                                            <ul class="list-unstyled ms-3">
+                                                <li><strong>Replies:</strong> <span id="overview-reply-ratio">-</span>%</li>
+                                                <li><strong>Posts:</strong> <span id="overview-post-ratio">-</span>%</li>
+                                                <li><strong>Brand Mentions:</strong> <span id="overview-brand-ratio">-</span>%</li>
+                                                <li><strong>Product Mentions:</strong> <span id="overview-product-ratio">-</span>%</li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <!-- User Profiles -->
+                                        <div class="col-md-6 mb-3">
+                                            <h6 class="text-primary"><i class="fas fa-user-circle"></i> Active User Profiles</h6>
+                                            <div id="overview-user-profiles" class="ms-3">
+                                                <span class="badge bg-secondary">Loading...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <!-- Target Keywords -->
+                                        <div class="col-md-6 mb-3">
+                                            <h6 class="text-primary"><i class="fas fa-key"></i> Target Keywords</h6>
+                                            <div id="overview-keywords" class="ms-3">
+                                                <span class="badge bg-secondary">Loading...</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Target Subreddits -->
+                                        <div class="col-md-6 mb-3">
+                                            <h6 class="text-primary"><i class="fas fa-comments"></i> Target Subreddits</h6>
+                                            <div id="overview-subreddits" class="ms-3">
+                                                <span class="badge bg-secondary">Loading...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Custom Instructions -->
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <h6 class="text-primary"><i class="fas fa-file-alt"></i> Custom Instructions</h6>
+                                            <div id="overview-instructions" class="ms-3 p-3" style="background: #f8f9fa; border-radius: 8px; font-size: 14px;">
+                                                Loading...
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -393,6 +452,22 @@
                     </div>
 
                     <!-- Recent Activity Feed -->
+                    <div class="info-card mt-4">
+                        <h5 class="mb-3">
+                            <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i> 
+                            Negative Brand Mentions
+                        </h5>
+                        <p class="text-muted">Monitor and respond to negative sentiment mentions</p>
+                        
+                        <div id="negativeMentionsList" style="max-height: 500px; overflow-y: auto;">
+                            <div class="loading">
+                                <i class="fas fa-spinner"></i>
+                                <p>Scanning for negative mentions...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                     <div class="info-card">
                         <h5 class="mb-3"><i class="fas fa-bell"></i> Real-Time Activity Feed</h5>
                         <div id="activityFeed" style="max-height: 400px; overflow-y: auto;">
@@ -430,25 +505,21 @@
                     </div>
 
                     <!-- NEGATIVE BRAND MENTIONS SECTION -->
-                    <div class="info-card mt-4">
-                        <h5 class="mb-3">
-                            <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i> 
-                            Negative Brand Mentions
-                        </h5>
-                        <p class="text-muted">Monitor and respond to negative sentiment mentions</p>
-                        
-                        <div id="negativeMentionsList" style="max-height: 500px; overflow-y: auto;">
-                            <div class="loading">
-                                <i class="fas fa-spinner"></i>
-                                <p>Scanning for negative mentions...</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Content History Tab -->
                 <div class="tab-pane fade" id="content">
                     <h3 class="mb-4"><i class="fas fa-file-alt"></i> Content Delivery History</h3>
+                    
+                    <div class="alert alert-info mb-4" style="border-left: 4px solid #667eea;">
+                        <h6><i class="fas fa-info-circle"></i> About Content History</h6>
+                        <p class="mb-2"><strong>This log shows every piece of content EchoMind has delivered on your behalf.</strong></p>
+                        <ul class="mb-0" style="font-size: 14px;">
+                            <li><strong>Replies:</strong> Responses to other users' posts where your brand adds value</li>
+                            <li><strong>Posts:</strong> Original threads started by your brand to spark discussions</li>
+                            <li><strong>Subreddit Context:</strong> Where each piece of content was posted</li>
+                            <li><strong>Performance Metrics:</strong> Upvotes, comments, and engagement for each post</li>
+                            <li><strong>Reddit Links:</strong> Direct links to view the content on Reddit</li>
+                        </ul>
+                    </div>
                     
                     <div class="info-card mb-3">
                         <div class="row">
@@ -498,6 +569,36 @@
                         </div>
                     </div>
 
+
+                    <!-- Embeddings & Vectors Explanation -->
+                    <div class="info-card mb-4" style="background: linear-gradient(135deg, #f0f4ff 0%, #fff5f5 100%); border-left: 4px solid #667eea;">
+                        <h5><i class="fas fa-brain"></i> How Document Intelligence Works</h5>
+                        <p class="mb-3"><strong>Your documents are processed using advanced AI to understand and reference your brand content intelligently.</strong></p>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-primary"><i class="fas fa-file-alt"></i> Document Processing</h6>
+                                <ul class="small" style="line-height: 1.8;">
+                                    <li><strong>Text Extraction:</strong> All uploaded documents are read and processed to extract text content</li>
+                                    <li><strong>Smart Chunking:</strong> Content is split into meaningful sections (chunks) for better context understanding</li>
+                                    <li><strong>Vector Embeddings:</strong> Each chunk is converted into a 1536-dimensional mathematical representation (vector) using OpenAI's embedding model</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-primary"><i class="fas fa-search"></i> Intelligent Retrieval</h6>
+                                <ul class="small" style="line-height: 1.8;">
+                                    <li><strong>Semantic Search:</strong> When generating responses, EchoMind searches your documents by meaning, not just keywords</li>
+                                    <li><strong>Context-Aware:</strong> Finds the most relevant information based on the conversation context</li>
+                                    <li><strong>Real-time Reference:</strong> Pulls accurate information from your brand guidelines, FAQs, and product docs to craft authentic responses</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info mt-2 mb-0" style="font-size: 14px;">
+                            <strong><i class="fas fa-lightbulb"></i> Why This Matters:</strong> Instead of generic AI responses, EchoMind references your actual brand voice, product specifications, and guidelines to create authentic, on-brand content that accurately represents your business. The more comprehensive your documents, the more intelligent and accurate your automated responses become.
+                        </div>
+                    </div>
                     <div class="info-card">
                         <h5 class="mb-3"><i class="fas fa-list"></i> Uploaded Documents</h5>
                         <div id="documentsList">

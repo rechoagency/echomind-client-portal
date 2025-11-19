@@ -37,6 +37,7 @@ async function loadClientData() {
         
         // Load keywords and subreddits
         loadKeywords();
+        populateOverviewSettings();
         loadSubreddits();
         
     } catch (error) {
@@ -202,6 +203,7 @@ async function addKeyword() {
         if (response.ok) {
             clientData.target_keywords = keywords;
             loadKeywords();
+        populateOverviewSettings();
             alert('✅ Keyword added successfully!');
         } else {
             throw new Error('Failed to add keyword');
@@ -232,6 +234,7 @@ async function removeKeyword(index) {
         if (response.ok) {
             clientData.target_keywords = keywords;
             loadKeywords();
+        populateOverviewSettings();
             alert('✅ Keyword removed successfully!');
         } else {
             throw new Error('Failed to remove keyword');
@@ -300,5 +303,76 @@ async function removeSubreddit(index) {
     } catch (error) {
         console.error('Error removing subreddit:', error);
         alert('❌ Failed to remove subreddit. Please try again.');
+    }
+}
+
+// Populate Overview System Settings section
+async function populateOverviewSettings() {
+    try {
+        // Fetch client settings for ratios
+        const settingsResponse = await fetch(`${API_URL}/api/client-settings/${CLIENT_ID}`);
+        if (settingsResponse.ok) {
+            const settings = await settingsResponse.json();
+            
+            // Update strategy ratios
+            const replyRatio = settings.reply_percentage || 75;
+            const postRatio = settings.post_percentage || 25;
+            document.getElementById('overview-reply-ratio').textContent = replyRatio;
+            document.getElementById('overview-post-ratio').textContent = postRatio;
+            document.getElementById('overview-brand-ratio').textContent = settings.brand_mention_percentage || 0;
+            document.getElementById('overview-product-ratio').textContent = settings.product_mention_percentage || 0;
+        }
+        
+        // Populate keywords
+        if (clientData.target_keywords && clientData.target_keywords.length > 0) {
+            const keywords = Array.isArray(clientData.target_keywords) 
+                ? clientData.target_keywords 
+                : clientData.target_keywords.split(',');
+            
+            document.getElementById('overview-keywords').innerHTML = keywords
+                .map(kw => `<span class="badge bg-primary me-1 mb-1">${kw.trim()}</span>`)
+                .join('');
+        } else {
+            document.getElementById('overview-keywords').innerHTML = '<span class="text-muted">No keywords configured</span>';
+        }
+        
+        // Populate subreddits
+        if (clientData.target_subreddits && clientData.target_subreddits.length > 0) {
+            const subreddits = Array.isArray(clientData.target_subreddits) 
+                ? clientData.target_subreddits 
+                : clientData.target_subreddits.split(',');
+            
+            document.getElementById('overview-subreddits').innerHTML = subreddits
+                .map(sub => `<span class="badge bg-info me-1 mb-1">r/${sub.trim()}</span>`)
+                .join('');
+        } else {
+            document.getElementById('overview-subreddits').innerHTML = '<span class="text-muted">No subreddits configured</span>';
+        }
+        
+        // Populate custom instructions
+        if (clientData.brand_voice || clientData.posting_guidelines) {
+            const instructions = clientData.brand_voice || clientData.posting_guidelines || 'No custom instructions set';
+            document.getElementById('overview-instructions').textContent = instructions;
+        } else {
+            document.getElementById('overview-instructions').innerHTML = '<span class="text-muted">No custom instructions configured. Content will use default brand guidelines.</span>';
+        }
+        
+        // Populate user profiles (fetch from database)
+        const profilesResponse = await fetch(`${API_URL}/api/user-profiles?client_id=${CLIENT_ID}`);
+        if (profilesResponse.ok) {
+            const profiles = await profilesResponse.json();
+            if (profiles && profiles.length > 0) {
+                document.getElementById('overview-user-profiles').innerHTML = profiles
+                    .map(p => `<span class="badge bg-success me-1 mb-1">u/${p.username}</span>`)
+                    .join('');
+            } else {
+                document.getElementById('overview-user-profiles').innerHTML = '<span class="text-muted">No user profiles configured</span>';
+            }
+        } else {
+            document.getElementById('overview-user-profiles').innerHTML = '<span class="text-muted">Unable to load profiles</span>';
+        }
+        
+    } catch (error) {
+        console.error('Error populating overview settings:', error);
     }
 }
