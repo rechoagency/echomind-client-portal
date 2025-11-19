@@ -84,7 +84,7 @@ function updateSliderValue(elementId, value, type) {
     }
 }
 
-// Save strategy settings - FIXED: Use correct endpoint and all required fields
+// Save strategy settings - UPDATED to use /strategy endpoint
 async function saveStrategy() {
     const replyPercentage = parseFloat(document.getElementById('replyPostSlider').value);
     const brandPercentage = parseFloat(document.getElementById('brandMentionSlider').value);
@@ -92,18 +92,13 @@ async function saveStrategy() {
     
     const settings = {
         reply_percentage: replyPercentage,
-        post_percentage: 100 - replyPercentage,
         brand_mention_percentage: brandPercentage,
-        product_mention_percentage: productPercentage,
-        product_relevance_threshold: 0.75,
-        current_phase: 1,
-        explicit_instructions: null,
-        auto_phase_progression: false
+        product_mention_percentage: productPercentage
     };
     
     try {
-        const response = await fetch(`${API_URL}/api/client-settings/${CLIENT_ID}`, {
-            method: 'POST',
+        const response = await fetch(`${API_URL}/api/clients/${CLIENT_ID}/strategy`, {
+            method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -112,6 +107,8 @@ async function saveStrategy() {
         
         if (response.ok) {
             alert('✅ Strategy settings saved successfully!');
+            // Refresh Overview tab to show updated settings
+            await refreshOverviewSettings();
         } else {
             const error = await response.json();
             throw new Error(error.detail || 'Failed to save settings');
@@ -119,6 +116,21 @@ async function saveStrategy() {
     } catch (error) {
         console.error('Error saving settings:', error);
         alert('❌ Failed to save settings. ' + error.message);
+    }
+}
+
+// NEW: Refresh Overview settings after strategy change
+async function refreshOverviewSettings() {
+    try {
+        const response = await fetch(`${API_URL}/api/clients/${CLIENT_ID}`);
+        if (!response.ok) return;
+        
+        clientData = await response.json();
+        populateOverviewSettings();
+        
+        console.log('✅ Overview settings refreshed after strategy change');
+    } catch (error) {
+        console.error('Error refreshing overview:', error);
     }
 }
 
@@ -152,7 +164,7 @@ function loadKeywords() {
     `;
 }
 
-// Load subreddits with edit capability
+// Load subreddits with edit capability and ownership indicators
 function loadSubreddits() {
     if (!clientData || !clientData.target_subreddits) {
         document.getElementById('subredditsList').innerHTML = `
@@ -168,12 +180,20 @@ function loadSubreddits() {
         ? clientData.target_subreddits 
         : clientData.target_subreddits.split(',');
     
-    const html = subreddits.map((subreddit, index) => 
-        `<span class="badge-custom badge-primary">
-            r/${subreddit.trim().replace('r/', '')}
+    const ownedSubreddits = clientData.owned_subreddits || [];
+    
+    const html = subreddits.map((subreddit, index) => {
+        const subName = subreddit.trim().replace('r/', '');
+        const isOwned = ownedSubreddits.includes(subName) || ownedSubreddits.includes('r/' + subName);
+        const ownershipIcon = isOwned 
+            ? '<i class="fas fa-crown" title="Owned by brand" style="color: #FFD700; margin-right: 6px;"></i>'
+            : '<i class="fas fa-users" title="Community subreddit" style="color: #666; margin-right: 6px;"></i>';
+        
+        return `<span class="badge-custom badge-primary">
+            ${ownershipIcon}r/${subName}
             <button class="btn-remove-badge" onclick="removeSubreddit(${index})">&times;</button>
-        </span>`
-    ).join('');
+        </span>`;
+    }).join('');
     
     document.getElementById('subredditsList').innerHTML = html + `
         <button class="btn btn-sm btn-primary mt-2" onclick="addSubreddit()">
