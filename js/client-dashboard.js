@@ -369,27 +369,59 @@ async function populateOverviewSettings() {
             document.getElementById('overview-subreddits').innerHTML = '<span class="text-muted">No subreddits configured</span>';
         }
         
-        // Populate custom instructions
-        if (clientData.brand_voice || clientData.posting_guidelines) {
-            const instructions = clientData.brand_voice || clientData.posting_guidelines || 'No custom instructions set';
+        // Populate owned subreddits
+        const ownedSubreddits = clientData.owned_subreddits || clientData.brand_owned_subreddits || [];
+        if (ownedSubreddits.length > 0) {
+            const owned = Array.isArray(ownedSubreddits) ? ownedSubreddits : [];
+            document.getElementById('overview-owned-subreddits').innerHTML = owned
+                .map(sub => `<span class="badge bg-warning me-1 mb-1"><i class="fas fa-crown"></i> r/${sub.trim()}</span>`)
+                .join('');
+        } else {
+            document.getElementById('overview-owned-subreddits').innerHTML = '<span class="text-muted">No owned subreddits. All subreddits are community-managed.</span>';
+        }
+        
+        // Populate custom instructions from multiple possible fields
+        const instructions = clientData.brand_voice 
+            || clientData.posting_guidelines 
+            || clientData.brand_voice_guidelines 
+            || clientData.special_instructions 
+            || null;
+        
+        if (instructions) {
             document.getElementById('overview-instructions').textContent = instructions;
         } else {
             document.getElementById('overview-instructions').innerHTML = '<span class="text-muted">No custom instructions configured. Content will use default brand guidelines.</span>';
         }
         
-        // Populate user profiles (fetch from database)
-        const profilesResponse = await fetch(`${API_URL}/api/user-profiles?client_id=${CLIENT_ID}`);
-        if (profilesResponse.ok) {
-            const profiles = await profilesResponse.json();
-            if (profiles && profiles.length > 0) {
-                document.getElementById('overview-user-profiles').innerHTML = profiles
-                    .map(p => `<span class="badge bg-success me-1 mb-1">u/${p.username}</span>`)
-                    .join('');
-            } else {
+        // Populate user profiles from clientData or fetch from database
+        if (clientData.reddit_usernames && clientData.reddit_usernames.length > 0) {
+            // Use reddit_usernames field if available
+            const usernames = Array.isArray(clientData.reddit_usernames) 
+                ? clientData.reddit_usernames 
+                : clientData.reddit_usernames.split(',');
+            document.getElementById('overview-user-profiles').innerHTML = usernames
+                .map(u => `<span class="badge bg-success me-1 mb-1">u/${u.trim()}</span>`)
+                .join('');
+        } else {
+            // Try fetching from user profiles endpoint
+            try {
+                const profilesResponse = await fetch(`${API_URL}/api/user-profiles?client_id=${CLIENT_ID}`);
+                if (profilesResponse.ok) {
+                    const profiles = await profilesResponse.json();
+                    if (profiles && profiles.length > 0) {
+                        document.getElementById('overview-user-profiles').innerHTML = profiles
+                            .map(p => `<span class="badge bg-success me-1 mb-1">u/${p.username}</span>`)
+                            .join('');
+                    } else {
+                        document.getElementById('overview-user-profiles').innerHTML = '<span class="text-muted">No user profiles configured</span>';
+                    }
+                } else {
+                    document.getElementById('overview-user-profiles').innerHTML = '<span class="text-muted">No user profiles configured</span>';
+                }
+            } catch (error) {
+                console.error('Error loading profiles:', error);
                 document.getElementById('overview-user-profiles').innerHTML = '<span class="text-muted">No user profiles configured</span>';
             }
-        } else {
-            document.getElementById('overview-user-profiles').innerHTML = '<span class="text-muted">Unable to load profiles</span>';
         }
         
     } catch (error) {

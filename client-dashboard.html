@@ -331,6 +331,16 @@
                                         </div>
                                     </div>
                                     
+                                    <!-- Brand Owned Subreddits -->
+                                    <div class="row">
+                                        <div class="col-12 mb-3">
+                                            <h6 class="text-primary"><i class="fas fa-crown" style="color: #FFD700;"></i> Brand Owned Subreddits</h6>
+                                            <div id="overview-owned-subreddits" class="ms-3">
+                                                <span class="badge bg-secondary">Loading...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
                                     <!-- Custom Instructions -->
                                     <div class="row">
                                         <div class="col-12">
@@ -466,9 +476,9 @@
                             </div>
                         </div>
                     </div>
-                </div>
 
-                    <div class="info-card">
+                    <!-- Real-Time Activity Feed - MOVED INSIDE ANALYTICS TAB -->
+                    <div class="info-card mt-4">
                         <h5 class="mb-3"><i class="fas fa-bell"></i> Real-Time Activity Feed</h5>
                         <div id="activityFeed" style="max-height: 400px; overflow-y: auto;">
                             <div class="loading">
@@ -477,7 +487,8 @@
                             </div>
                         </div>
                     </div>
-                    <!-- AUTO-RESPONSES LOG SECTION - INSERT AFTER ACTIVITY FEED -->
+
+                    <!-- AUTO-RESPONSES LOG SECTION - MOVED INSIDE ANALYTICS TAB -->
                     <div class="info-card mt-4">
                         <h5 class="mb-3"><i class="fas fa-robot"></i> Auto-Responses Log</h5>
                         <p class="text-muted">Review all automated responses sent to brand mentions and replies</p>
@@ -503,8 +514,9 @@
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- NEGATIVE BRAND MENTIONS SECTION -->
+                <!-- NEGATIVE BRAND MENTIONS SECTION -->
                 <!-- Content History Tab -->
                 <div class="tab-pane fade" id="content">
                     <h3 class="mb-4"><i class="fas fa-file-alt"></i> Content Delivery History</h3>
