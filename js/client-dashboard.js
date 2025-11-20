@@ -380,15 +380,28 @@ async function populateOverviewSettings() {
             document.getElementById('overview-owned-subreddits').innerHTML = '<span class="text-muted">No owned subreddits. All subreddits are community-managed.</span>';
         }
         
-        // Populate custom instructions from multiple possible fields
-        const instructions = clientData.brand_voice 
-            || clientData.posting_guidelines 
-            || clientData.brand_voice_guidelines 
-            || clientData.special_instructions 
-            || null;
+        // Populate custom instructions - show BOTH brand voice AND special instructions
+        const brandVoice = clientData.brand_voice || clientData.brand_voice_guidelines;
+        const specialInstructions = clientData.special_instructions || clientData.explicit_instructions;
         
-        if (instructions) {
-            document.getElementById('overview-instructions').textContent = instructions;
+        let instructionsHTML = '';
+        
+        if (brandVoice) {
+            instructionsHTML += `<div class="mb-3">
+                <strong class="text-primary">Brand Voice:</strong>
+                <div class="mt-1">${brandVoice}</div>
+            </div>`;
+        }
+        
+        if (specialInstructions) {
+            instructionsHTML += `<div class="mb-3">
+                <strong class="text-warning">Special Instructions:</strong>
+                <div class="mt-1">${specialInstructions}</div>
+            </div>`;
+        }
+        
+        if (instructionsHTML) {
+            document.getElementById('overview-instructions').innerHTML = instructionsHTML;
         } else {
             document.getElementById('overview-instructions').innerHTML = '<span class="text-muted">No custom instructions configured. Content will use default brand guidelines.</span>';
         }
