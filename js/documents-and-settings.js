@@ -1,9 +1,15 @@
 // Documents Tab Functions
 async function loadDocuments() {
+    console.log('[DEBUG] loadDocuments called');
+    console.log('[DEBUG] API_URL:', typeof API_URL !== 'undefined' ? API_URL : 'UNDEFINED');
+    console.log('[DEBUG] CLIENT_ID:', typeof CLIENT_ID !== 'undefined' ? CLIENT_ID : 'UNDEFINED');
+    
     try {
         const response = await fetch(`${API_URL}/api/clients/${CLIENT_ID}/documents`);
+        console.log('[DEBUG] Documents response status:', response.status);
+        
         if (!response.ok) {
-            throw new Error('Failed to load documents');
+            throw new Error(`Failed to load documents: ${response.status} ${response.statusText}`);
         }
         
         const data = await response.json();
@@ -141,19 +147,42 @@ async function uploadDocuments(files) {
 
 // Special Instructions Functions
 async function loadSpecialInstructions() {
+    console.log('[DEBUG] loadSpecialInstructions called');
+    console.log('[DEBUG] API_URL:', typeof API_URL !== 'undefined' ? API_URL : 'UNDEFINED');
+    console.log('[DEBUG] CLIENT_ID:', typeof CLIENT_ID !== 'undefined' ? CLIENT_ID : 'UNDEFINED');
+    
+    const container = document.getElementById('specialInstructionsContainer');
+    if (!container) {
+        console.error('[ERROR] specialInstructionsContainer not found in DOM');
+        return;
+    }
+    
     try {
         const response = await fetch(`${API_URL}/api/clients/${CLIENT_ID}/special-instructions`);
+        console.log('[DEBUG] Special instructions response status:', response.status);
+        
         if (!response.ok) {
-            throw new Error('Failed to load special instructions');
+            throw new Error(`Failed to load special instructions: ${response.status} ${response.statusText}`);
         }
         
         const data = await response.json();
+        console.log('[DEBUG] Special instructions data:', data);
         const instructions = data.instructions || [];
         
         displaySpecialInstructions(instructions);
         
     } catch (error) {
-        console.error('Error loading special instructions:', error);
+        console.error('[ERROR] Error loading special instructions:', error);
+        // Show error in UI instead of spinner
+        const container = document.getElementById('specialInstructionsContainer');
+        if (container) {
+            container.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    Failed to load special instructions: ${error.message}
+                </div>
+            `;
+        }
     }
 }
 

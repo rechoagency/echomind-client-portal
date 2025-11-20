@@ -400,7 +400,12 @@ async function populateOverviewSettings() {
                 ? clientData.reddit_usernames 
                 : clientData.reddit_usernames.split(',');
             document.getElementById('overview-user-profiles').innerHTML = usernames
-                .map(u => `<span class="badge bg-success me-1 mb-1">u/${u.trim()}</span>`)
+                .map(u => {
+                    const username = u.trim();
+                    // Remove u/ prefix if it already exists
+                    const displayName = username.startsWith('u/') ? username : `u/${username}`;
+                    return `<span class="badge bg-success me-1 mb-1">${displayName}</span>`;
+                })
                 .join('');
         } else {
             // Try fetching from user profiles endpoint
@@ -410,7 +415,13 @@ async function populateOverviewSettings() {
                     const profiles = await profilesResponse.json();
                     if (profiles && profiles.length > 0) {
                         document.getElementById('overview-user-profiles').innerHTML = profiles
-                            .map(p => `<span class="badge bg-success me-1 mb-1">u/${p.username}</span>`)
+                            .map(p => {
+                                const username = p.username || '';
+                                // Clean username - remove 'u/' if present, then add it back consistently
+                                const cleanUsername = username.replace(/^u\//, '');
+                                const displayName = cleanUsername ? `u/${cleanUsername}` : username;
+                                return `<span class="badge bg-success me-1 mb-1">${displayName}</span>`;
+                            })
                             .join('');
                     } else {
                         document.getElementById('overview-user-profiles').innerHTML = '<span class="text-muted">No user profiles configured</span>';

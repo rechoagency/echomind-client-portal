@@ -11,6 +11,7 @@ let subreddits = [];
 let keywords = [];
 let excludedKeywords = [];
 let brandOwnedSubreddits = [];
+let moderatorUsernames = [];
 let profiles = [];
 let uploadedFiles = [];
 let autoIdentifySubreddits = false;
@@ -388,6 +389,44 @@ function initializeTagInputs() {
         });
     }
     
+    // Moderator Usernames
+    const moderatorUsernamesInput = document.getElementById('moderatorUsernamesInput');
+    const moderatorUsernamesContainer = document.getElementById('moderatorUsernamesContainer');
+    
+    if (moderatorUsernamesInput && moderatorUsernamesContainer) {
+        moderatorUsernamesInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const value = moderatorUsernamesInput.value.trim();
+                if (value) {
+                    if (!moderatorUsernames.includes(value)) {
+                        moderatorUsernames.push(value);
+                    }
+                    renderTags(moderatorUsernamesContainer, moderatorUsernames, moderatorUsernamesInput);
+                    moderatorUsernamesInput.value = '';
+                }
+            }
+        });
+
+        moderatorUsernamesInput.addEventListener('input', (e) => {
+            if (e.target.value.includes(',')) {
+                const values = e.target.value.split(',');
+                values.forEach(val => {
+                    const trimmed = val.trim();
+                    if (trimmed && !moderatorUsernames.includes(trimmed)) {
+                        moderatorUsernames.push(trimmed);
+                    }
+                });
+                renderTags(moderatorUsernamesContainer, moderatorUsernames, moderatorUsernamesInput);
+                e.target.value = '';
+            }
+        });
+
+        moderatorUsernamesContainer.addEventListener('click', () => {
+            moderatorUsernamesInput.focus();
+        });
+    }
+    
     console.log('Tag inputs initialized successfully');
 }
 
@@ -448,6 +487,12 @@ function removeTagByValue(containerId, value) {
             brandOwnedSubreddits.splice(index, 1);
         }
         renderTags(container, brandOwnedSubreddits, input);
+    } else if (containerId === 'moderatorUsernamesContainer') {
+        const index = moderatorUsernames.indexOf(value);
+        if (index > -1) {
+            moderatorUsernames.splice(index, 1);
+        }
+        renderTags(container, moderatorUsernames, input);
     }
 }
 
@@ -814,6 +859,7 @@ async function submitForm() {
             target_subreddits: autoIdentifySubreddits ? ['AUTO_IDENTIFY'] : subreddits,
             brand_owns_subreddit: document.getElementById('brandOwnsSubreddit').checked,
             brand_owned_subreddits: brandOwnedSubreddits,
+            moderator_usernames: moderatorUsernames,
             target_keywords: autoIdentifyKeywords ? ['AUTO_IDENTIFY'] : keywords,
             excluded_keywords: excludedKeywords,
             reddit_user_profiles: profiles.map(p => ({
