@@ -561,7 +561,39 @@
 
                 <!-- Documents Tab -->
                 <div class="tab-pane fade" id="documents">
-                    <h3 class="mb-4"><i class="fas fa-folder-open"></i> Brand Documents</h3>
+                    <h3 class="mb-4"><i class="fas fa-folder-open"></i> Brand Documents & Knowledge Base</h3>
+                    
+                    <!-- Knowledge Base Stats -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                <i class="fas fa-database" style="font-size: 24px; color: white; opacity: 0.8;"></i>
+                                <p class="stat-label" style="color: rgba(255,255,255,0.9);">Documents Uploaded</p>
+                                <h2 class="stat-value" id="knowledgeDocsCount" style="color: white;">-</h2>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                <i class="fas fa-puzzle-piece" style="font-size: 24px; color: white; opacity: 0.8;"></i>
+                                <p class="stat-label" style="color: rgba(255,255,255,0.9);">Knowledge Chunks</p>
+                                <h2 class="stat-value" id="knowledgeChunksCount" style="color: white;">-</h2>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                <i class="fas fa-lightbulb" style="font-size: 24px; color: white; opacity: 0.8;"></i>
+                                <p class="stat-label" style="color: rgba(255,255,255,0.9);">Insights Used (7d)</p>
+                                <h2 class="stat-value" id="knowledgeInsightsUsed" style="color: white;">-</h2>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                                <i class="fas fa-chart-line" style="font-size: 24px; color: white; opacity: 0.8;"></i>
+                                <p class="stat-label" style="color: rgba(255,255,255,0.9);">Usage Rate</p>
+                                <h2 class="stat-value" id="knowledgeUsageRate" style="color: white;">-%</h2>
+                            </div>
+                        </div>
+                    </div>
                     
                     <div class="info-card mb-4">
                         <h5><i class="fas fa-upload"></i> Upload Additional Documents</h5>

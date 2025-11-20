@@ -1,4 +1,34 @@
 // Documents Tab Functions
+async function loadKnowledgeBaseStats() {
+    console.log('[DEBUG] loadKnowledgeBaseStats called');
+    
+    try {
+        const response = await fetch(`${API_URL}/api/reports/${CLIENT_ID}/knowledge-base-stats`);
+        console.log('[DEBUG] Knowledge base stats response status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`Failed to load knowledge base stats: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('[DEBUG] Knowledge base stats:', data);
+        
+        // Update stat cards
+        document.getElementById('knowledgeDocsCount').textContent = data.knowledge_base.documents_uploaded || 0;
+        document.getElementById('knowledgeChunksCount').textContent = data.knowledge_base.knowledge_chunks || 0;
+        document.getElementById('knowledgeInsightsUsed').textContent = data.usage_last_7_days.total_insights_cited || 0;
+        document.getElementById('knowledgeUsageRate').textContent = `${data.usage_last_7_days.usage_rate_percentage || 0}%`;
+        
+    } catch (error) {
+        console.error('Error loading knowledge base stats:', error);
+        // Set to 0 on error
+        document.getElementById('knowledgeDocsCount').textContent = '0';
+        document.getElementById('knowledgeChunksCount').textContent = '0';
+        document.getElementById('knowledgeInsightsUsed').textContent = '0';
+        document.getElementById('knowledgeUsageRate').textContent = '0%';
+    }
+}
+
 async function loadDocuments() {
     console.log('[DEBUG] loadDocuments called');
     console.log('[DEBUG] API_URL:', typeof API_URL !== 'undefined' ? API_URL : 'UNDEFINED');
@@ -290,3 +320,15 @@ async function saveNotificationSettings() {
         alert('❌ Failed to save settings. ' + error.message);
     }
 }
+
+// Load knowledge base stats when Documents tab is shown
+document.addEventListener('DOMContentLoaded', function() {
+    // Listen for Documents tab activation
+    const documentsTab = document.querySelector('[data-bs-target="#documents"]');
+    if (documentsTab) {
+        documentsTab.addEventListener('shown.bs.tab', function() {
+            console.log('[DEBUG] Documents tab shown - loading knowledge base stats');
+            loadKnowledgeBaseStats();
+        });
+    }
+});
