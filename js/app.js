@@ -12,6 +12,8 @@ let keywords = [];
 let excludedKeywords = [];
 let brandOwnedSubreddits = [];
 let moderatorUsernames = [];
+let nonOwnedSubreddits = [];
+let nonOwnedModerators = [];
 let profiles = [];
 let uploadedFiles = [];
 let autoIdentifySubreddits = false;
@@ -427,6 +429,82 @@ function initializeTagInputs() {
         });
     }
     
+    // Non-Owned Subreddits
+    const nonOwnedInput = document.getElementById('nonOwnedInput');
+    const nonOwnedContainer = document.getElementById('nonOwnedContainer');
+    
+    if (nonOwnedInput && nonOwnedContainer) {
+        nonOwnedInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const value = nonOwnedInput.value.trim();
+                if (value) {
+                    if (!nonOwnedSubreddits.includes(value)) {
+                        nonOwnedSubreddits.push(value);
+                    }
+                    renderTags(nonOwnedContainer, nonOwnedSubreddits, nonOwnedInput);
+                    nonOwnedInput.value = '';
+                }
+            }
+        });
+
+        nonOwnedInput.addEventListener('input', (e) => {
+            if (e.target.value.includes(',')) {
+                const values = e.target.value.split(',');
+                values.forEach(val => {
+                    const trimmed = val.trim();
+                    if (trimmed && !nonOwnedSubreddits.includes(trimmed)) {
+                        nonOwnedSubreddits.push(trimmed);
+                    }
+                });
+                renderTags(nonOwnedContainer, nonOwnedSubreddits, nonOwnedInput);
+                e.target.value = '';
+            }
+        });
+
+        nonOwnedContainer.addEventListener('click', () => {
+            nonOwnedInput.focus();
+        });
+    }
+    
+    // Non-Owned Moderators
+    const nonOwnedModeratorsInput = document.getElementById('nonOwnedModeratorsInput');
+    const nonOwnedModeratorsContainer = document.getElementById('nonOwnedModeratorsContainer');
+    
+    if (nonOwnedModeratorsInput && nonOwnedModeratorsContainer) {
+        nonOwnedModeratorsInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const value = nonOwnedModeratorsInput.value.trim();
+                if (value) {
+                    if (!nonOwnedModerators.includes(value)) {
+                        nonOwnedModerators.push(value);
+                    }
+                    renderTags(nonOwnedModeratorsContainer, nonOwnedModerators, nonOwnedModeratorsInput);
+                    nonOwnedModeratorsInput.value = '';
+                }
+            }
+        });
+
+        nonOwnedModeratorsInput.addEventListener('input', (e) => {
+            if (e.target.value.includes(',')) {
+                const values = e.target.value.split(',');
+                values.forEach(val => {
+                    const trimmed = val.trim();
+                    if (trimmed && !nonOwnedModerators.includes(trimmed)) {
+                        nonOwnedModerators.push(trimmed);
+                    }
+                });
+                renderTags(nonOwnedModeratorsContainer, nonOwnedModerators, nonOwnedModeratorsInput);
+                e.target.value = '';
+            }
+        });
+
+        nonOwnedModeratorsContainer.addEventListener('click', () => {
+            nonOwnedModeratorsInput.focus();
+        });
+    }
+    
     console.log('Tag inputs initialized successfully');
 }
 
@@ -493,6 +571,18 @@ function removeTagByValue(containerId, value) {
             moderatorUsernames.splice(index, 1);
         }
         renderTags(container, moderatorUsernames, input);
+    } else if (containerId === 'nonOwnedContainer') {
+        const index = nonOwnedSubreddits.indexOf(value);
+        if (index > -1) {
+            nonOwnedSubreddits.splice(index, 1);
+        }
+        renderTags(container, nonOwnedSubreddits, input);
+    } else if (containerId === 'nonOwnedModeratorsContainer') {
+        const index = nonOwnedModerators.indexOf(value);
+        if (index > -1) {
+            nonOwnedModerators.splice(index, 1);
+        }
+        renderTags(container, nonOwnedModerators, input);
     }
 }
 
@@ -546,6 +636,25 @@ function toggleBrandOwnedField() {
         if (container && input) {
             renderTags(container, brandOwnedSubreddits, input);
         }
+    }
+}
+
+function toggleNonOwnedField() {
+    const checkbox = document.getElementById('targetNonOwnedSubreddit');
+    const field = document.getElementById('nonOwnedField');
+    
+    if (checkbox.checked) {
+        field.style.display = 'block';
+    } else {
+        field.style.display = 'none';
+        nonOwnedSubreddits = [];
+        nonOwnedModerators = [];
+        const container1 = document.getElementById('nonOwnedContainer');
+        const input1 = document.getElementById('nonOwnedInput');
+        const container2 = document.getElementById('nonOwnedModeratorsContainer');
+        const input2 = document.getElementById('nonOwnedModeratorsInput');
+        if (container1 && input1) renderTags(container1, nonOwnedSubreddits, input1);
+        if (container2 && input2) renderTags(container2, nonOwnedModerators, input2);
     }
 }
 
@@ -860,6 +969,9 @@ async function submitForm() {
             brand_owns_subreddit: document.getElementById('brandOwnsSubreddit').checked,
             brand_owned_subreddits: brandOwnedSubreddits,
             moderator_usernames: moderatorUsernames,
+            target_non_owned_subreddit: document.getElementById('targetNonOwnedSubreddit')?.checked || false,
+            non_owned_subreddits: nonOwnedSubreddits,
+            non_owned_moderators: nonOwnedModerators,
             target_keywords: autoIdentifyKeywords ? ['AUTO_IDENTIFY'] : keywords,
             excluded_keywords: excludedKeywords,
             reddit_user_profiles: profiles.map(p => ({
