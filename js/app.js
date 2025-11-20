@@ -860,8 +860,21 @@ async function submitForm() {
             });
         }
         
+        // Show success message with reports timing
+        const reportsMessage = result.reports_message || "Intelligence reports will be ready in 5-10 minutes";
+        const reportsEmail = result.reports_email || "your email";
+        
+        alert(
+            `✅ ${result.message}\n\n` +
+            `📊 ${reportsMessage}\n` +
+            `📧 Reports will be sent to: ${reportsEmail}\n\n` +
+            `Redirecting to your dashboard...`
+        );
+        
         // Redirect to dashboard after successful onboarding
-        window.location.href = `/dashboard.html?client_id=${result.client_id}`;
+        setTimeout(() => {
+            window.location.href = `/dashboard.html?client_id=${result.client_id}`;
+        }, 3000);
         
     } catch (error) {
         console.error('Submission error:', error);
