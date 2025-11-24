@@ -644,9 +644,9 @@ function toggleNonOwnedField() {
     const field = document.getElementById('nonOwnedField');
     
     if (checkbox.checked) {
-        field.style.display = 'block';
+        field.classList.add('active');
     } else {
-        field.style.display = 'none';
+        field.classList.remove('active');
         nonOwnedSubreddits = [];
         nonOwnedModerators = [];
         const container1 = document.getElementById('nonOwnedContainer');
