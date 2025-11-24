@@ -376,7 +376,7 @@
                 }
                 
                 // Load clients
-                const clientsResponse = await fetch(`${API_URL}/api/dashboard/clients`);
+                const clientsResponse = await fetch(`${API_URL}/api/clients`);
                 const clientsData = await clientsResponse.json();
                 
                 if (clientsData.success) {
